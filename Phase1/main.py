@@ -2,6 +2,9 @@ import arabic_reshaper
 import click
 from bidi.algorithm import get_display
 
+from Phase1 import Parser
+
+
 reshape_persian_words = True
 
 
@@ -31,8 +34,10 @@ def main():
     welcome_text = "با سلام به این برنامه خوش آمدید."
     print(get_persian_str(welcome_text))
 
-    main_jobs = ["Parsing Raw Files and Generating Documents", "Enter Query", "Make Positional Index"]
+    main_jobs = ["Parsing Raw Files and Generating Documents", "Remove Stopwords", "Make Positional Index"]
     job = prompt_from_list(main_jobs, "Please select a job you want to execute : ")
+    Parser.parse_wiki()
+
 
 
 if __name__ == "__main__":
