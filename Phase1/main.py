@@ -1,9 +1,9 @@
-import click
-
 import arabic_reshaper
+import click
 from bidi.algorithm import get_display
 
 reshape_persian_words = True
+
 
 def prompt_from_list(options: list, prompt_msg="Please Select One Option"):
     n = len(options)
@@ -28,15 +28,10 @@ def get_persian_str(raw_str, reshape=reshape_persian_words):
 
 
 def main():
-
-
-
-    reshaped_text = arabic_reshaper.reshape("سلام خوبی")
-    bidi_text = get_display(reshaped_text)
-    print(bidi_text)
+    welcome_text = "با سلام به این برنامه خوش آمدید."
+    print(get_persian_str(welcome_text))
 
     main_jobs = ["Parsing Raw Files and Generating Documents", "Enter Query", "Make Positional Index"]
-    print("سلام خوبی")
     job = prompt_from_list(main_jobs, "Please select a job you want to execute : ")
 
 
