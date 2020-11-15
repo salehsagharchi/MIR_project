@@ -93,6 +93,16 @@ class Compressor:
             i += count
         return self.posintgList
 
+    def save_to_file(self, path):
+        f = open(path, "wb")
+        f.write(bytearray(self.compressedPostingList))
+        f.close()
+
+    def load_from_file(self, path):
+        f = open(path, "rb")
+        self.compressedPostingList = f.read()
+        f.close()
+
 
 # a = Compressor()
 # a.posintgList = [824, 5, 214577]
@@ -100,6 +110,10 @@ class Compressor:
 # print(a.diff_memory_byte)
 # a.var_byte_decompress()
 # print(a.posintgList)
-# print(a.posintgList)
-# print(a.gama_code_compress())
+print(a.posintgList)
+print(a.gama_code_compress())
 # print(a.gama_codes_decompress())
+# a.save_to_file("s.txt")
+# b = Compressor()
+# b.load_from_file("s.txt")
+# print(b.gama_codes_decompress())
