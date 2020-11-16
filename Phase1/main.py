@@ -4,7 +4,6 @@ from bidi.algorithm import get_display
 
 from Phase1 import Parser
 
-
 reshape_persian_words = True
 
 
@@ -23,7 +22,9 @@ def prompt_from_list(options: list, prompt_msg="Please Select One Option"):
     return choice - 1
 
 
-def get_persian_str(raw_str, reshape=reshape_persian_words):
+def reshape_text(raw_str, lang, reshape=reshape_persian_words):
+    if lang != "fa":
+        return raw_str
     if not reshape:
         return raw_str
     reshaped_text = arabic_reshaper.reshape(raw_str)
@@ -32,12 +33,13 @@ def get_persian_str(raw_str, reshape=reshape_persian_words):
 
 def main():
     welcome_text = "با سلام به این برنامه خوش آمدید."
-    print(get_persian_str(welcome_text))
+    print(reshape_text(welcome_text, "fa"))
 
     main_jobs = ["Parsing Raw Files and Generating Documents", "Remove Stopwords", "Make Positional Index"]
-    job = prompt_from_list(main_jobs, "Please select a job you want to execute : ")
-    Parser.parse_wiki()
+    #job = prompt_from_list(main_jobs, "Please select a job you want to execute : ")
 
+    #Parser.remove_stopwords("fa")
+    Parser.parse_tedtalks()
 
 
 if __name__ == "__main__":
