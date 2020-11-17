@@ -2,7 +2,7 @@ import arabic_reshaper
 import click
 from bidi.algorithm import get_display
 
-import Parser
+from Phase1 import Parser
 
 reshape_persian_words = True
 
