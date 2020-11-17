@@ -40,6 +40,7 @@ def main():
 
     #Parser.remove_stopwords("fa")
     Parser.parse_tedtalks()
+    #Parser.remove_stopwords("en")
 
 
 if __name__ == "__main__":

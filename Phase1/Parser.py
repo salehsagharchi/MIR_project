@@ -90,26 +90,59 @@ def print_all_tokens(lang="fa"):
 
 def parse_tedtalks(dump=True):
 
+    ted_directory = "data/ted_docs/"
     all_tokens = dict()
     tokens_count = 0
 
     with open("data/raw_data/ted_talks.csv", encoding='Latin1') as csvfile:
-        csv_reader = csv.reader(csvfile, delimiter=',')
+        csv_reader = list(csv.reader(csvfile, delimiter=','))
         line_count = -1
-        for row in csv_reader:
-            line_count += 1
-            if line_count == 0:
-                continue
+        with click.progressbar(label='Parsing Ted Documents', length=len(csv_reader), fill_char="█") as bar:
+            for row in csv_reader:
+                line_count += 1
+                bar.update(1)
+                if line_count == 0:
+                    continue
+                else:
+                    docid = str(line_count)
+                    title = row[14]
+                    text = row[1]
+                    normalized_title = TextNormalizer.prepare_text(title, "en", False)
+                    tokens = TextNormalizer.prepare_text(text, "en")
+                    tokens_count += len(tokens)
+                    for token in tokens:
+                        all_tokens[token] = all_tokens.get(token, 0) + 1
+                    doc = Document(docid, title, normalized_title, text, tokens)
+                    if dump:
+                        with open(f"{ted_directory}{docid}.o", "wb") as file:
+                            pickle.dump(doc, file)
+
+
+    print(f"{line_count} Documents parsed successfully.")
+
+    stopwords = []
+    stopword_threshold = 0.0072
+
+    if os.path.isfile('data/stopwords_en.o'):
+        with open(f"data/stopwords_en.o", "rb") as file:
+            stopwords = pickle.load(file)
+    else:
+        sorted_word = {k: v for k, v in sorted(all_tokens.items(), key=lambda item: item[1], reverse=True)}
+        for i, key in enumerate(sorted_word):
+            if (sorted_word[key] / tokens_count) >= stopword_threshold:
+                stopwords.append(key)
             else:
-                docid = str(line_count)
-                title = row[14]
-                text = row[1]
-                normalized_title = TextNormalizer.prepare_text(title, "en", False)
-                tokens = TextNormalizer.prepare_text(text, "en")
+                break
+        with open(f"data/stopwords_en.o", "wb") as file:
+            pickle.dump(stopwords, file)
 
+    print("Calculated stopwords :", stopwords)
+    print("Token counts :", tokens_count)
+    print_all_tokens("en")
 
-
-        print(f'Processed {line_count} lines.')
+    with open(f"data/ted_docs/{1000}.o", "rb") as file:
+        doc: Document = pickle.load(file)
+        print(len(doc.tokens))
 
 
 def parse_wiki(dump=True):
@@ -209,6 +242,6 @@ def remove_stopwords(lang):
 
     print(f"{diff} Stopwords removed from all {lang} documents.")
 
-    with open(f"data/wiki_docs/{3016}.o", "rb") as file:
+    with open(f"data/ted_docs/{1000}.o", "rb") as file:
         doc: Document = pickle.load(file)
         print(len(doc.tokens))
