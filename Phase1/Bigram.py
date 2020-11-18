@@ -3,18 +3,16 @@ import pickle
 
 class Bigram:
     bigram_set = {}
-    FILE_NAME = 'bigrams'
+    FILE_NAME = 'data/bigrams.pkl'
 
     @classmethod
     def load_file(cls):
         try:
-            with open(cls.FILE_NAME + '.pkl', 'rb') as f:
+            with open(cls.FILE_NAME, 'rb') as f:
                 cls.bigram_set = pickle.load(f)
-                f.close()
         except FileNotFoundError:
-            with open(cls.FILE_NAME + '.pkl', 'wb') as f:
+            with open(cls.FILE_NAME, 'wb') as f:
                 pickle.dump({}, f, pickle.HIGHEST_PROTOCOL)
-                f.close()
 
     @classmethod
     def add_term_to_bigram(cls, term):
@@ -38,9 +36,8 @@ class Bigram:
 
     @classmethod
     def save_to_file(cls):
-        with open(cls.FILE_NAME + '.pkl', 'wb') as f:
+        with open(cls.FILE_NAME, 'wb') as f:
             pickle.dump(cls.bigram_set, f, pickle.HIGHEST_PROTOCOL)
-            f.close()
 
     @classmethod
     def get_terms_of_bigram(cls, bi):
@@ -103,40 +100,3 @@ class Bigram:
         if len(best) == 1:
             return best[0]
         return best
-
-    # @classmethod
-    # def get_nearest_terms(cls, term, distance=3):
-    #     set_of_terms = {}
-    #     for i in range(len(term) - 1):
-    #         bi = term[i:i + 2]
-    #         for t in cls.get_terms_of_bigram(bi):
-    #             if t in set_of_terms:
-    #                 set_of_terms[t] += 1
-    #             else:
-    #                 set_of_terms[t] = 1
-    #     res = []
-    #     for t in set_of_terms:
-    #         if set_of_terms[t] >= (len(term) - 1 - distance):
-    #             res.append(t)
-    #     return res
-
-
-# if __name__ == '__main__':
-#     pass
-#     Bigram.load_file()
-#
-    # str = """Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
-    # industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled
-    # it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic
-    # typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets
-    # containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker
-    # including versions of Lorem Ipsum. It is a long established fact that a reader will be distracted by the readable
-    # content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal
-    # distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.
-    # Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text,
-    # and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved
-    # over the years, sometimes by accident, sometimes on purpose (injected humour and the like). """.lower()
-#     for t in str.split(' '):
-#         Bigram.add_term_to_bigram(t)
-#     Bigram.save_to_file()
-

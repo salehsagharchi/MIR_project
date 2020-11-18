@@ -3,6 +3,8 @@ import click
 from bidi.algorithm import get_display
 
 from Phase1 import Parser
+from Phase1 import Bigram
+from Phase1 import Indexer
 
 reshape_persian_words = True
 
