@@ -1,3 +1,7 @@
+import os
+import pickle
+
+
 class Compressor:
     def __init__(self):
         self.posintgList = []
@@ -7,6 +11,8 @@ class Compressor:
         self.SIZE_OF_INT = 4
         self.diff_memory_byte = 0
         self.SIZE_OF_BYTE = 8
+        self.VAR_BYTE_MODE = 0
+        self.GAMA_CODES_MODE = 1
 
     def var_byte_compress(self):
         size_of_Result = 0
@@ -93,27 +99,58 @@ class Compressor:
             i += count
         return self.posintgList
 
-    def save_to_file(self, path):
-        f = open(path, "wb")
-        f.write(bytearray(self.compressedPostingList))
-        f.close()
+    def compress_arr(self, mode, arr):
+        self.posintgList = arr
+        if mode == self.VAR_BYTE_MODE:
+            self.var_byte_compress()
+        elif mode == self.GAMA_CODES_MODE:
+            self.gama_code_compress()
+        return self.compressedPostingList
 
-    def load_from_file(self, path):
-        f = open(path, "rb")
-        self.compressedPostingList = f.read()
-        f.close()
+    def decompress_arr(self, mode, compressed_arr):
+        self.compressedPostingList = compressed_arr
+        if mode == self.VAR_BYTE_MODE:
+            self.var_byte_decompress()
+        elif mode == self.GAMA_CODES_MODE:
+            self.gama_codes_decompress()
+        return self.posintgList
 
+    def compress(self, mode, dic):
+        for term in dic.keys():
+            currentTerm = dic[term]
+            for document in currentTerm.keys():
+                currentArr = currentTerm[document]
+                compressedArr = self.compress_arr(mode, currentArr)
+                dic[term][document] = bytearray(compressedArr)
+        return dic
 
-# a = Compressor()
-# a.posintgList = [824, 5, 214577]
-# print(a.var_byte_compress())
-# print(a.diff_memory_byte)
-# a.var_byte_decompress()
-# print(a.posintgList)
-print(a.posintgList)
-print(a.gama_code_compress())
-# print(a.gama_codes_decompress())
-# a.save_to_file("s.txt")
-# b = Compressor()
-# b.load_from_file("s.txt")
-# print(b.gama_codes_decompress())
+    def decompress(self, mode, compressedDic):
+        for term in compressedDic.keys():
+            currentTerm = compressedDic[term]
+            for document in currentTerm.keys():
+                compressedArr = currentTerm[document]
+                currentArr = self.decompress_arr(mode, compressedArr)
+                compressedDic[term][document] = currentArr
+        return compressedDic
+
+    def save_to_file(self, dic, mode, path=".\\data\\postingListData"):
+        with open(path + 'WithoutCompress.pkl', 'wb') as f:
+            pickle.dump(dic, f, pickle.HIGHEST_PROTOCOL)
+            f.flush()
+            f.close()
+        compressedDic = self.compress(mode, dic)
+        with open(path + '.pkl', 'wb') as f:
+            pickle.dump(compressedDic, f, pickle.HIGHEST_PROTOCOL)
+            f.flush()
+            f.close()
+        return os.path.getsize(path + 'WithoutCompress.pkl'), os.path.getsize(path + '.pkl')
+
+    def load_from_file(self, mode, path=".\\data\\postingListData"):
+        dic = {}
+        try:
+            with open(path + '.pkl', 'rb') as f:
+                dic = pickle.load(f)
+                f.close()
+                dic = self.decompress(mode, dic)
+        finally:
+            return dic
