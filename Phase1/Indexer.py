@@ -4,7 +4,6 @@ import pickle
 from Phase1.DataModels import Document
 from Phase1.Bigram import Bigram
 from Phase1.Compressor import Compressor
-from Phase1.Score import Score
 
 
 class Indexer:
@@ -80,10 +79,3 @@ class Indexer:
         if cls.index[term].get(doc_id) is None:
             return 0
         return len(cls.index[term][doc_id])
-
-
-if __name__ == '__main__':
-    Indexer.load_index(Compressor.VAR_BYTE_MODE)
-    # score = Score()
-    # res = score.query('کشور ایران آسیا'.split(' '))
-    # print(res)
