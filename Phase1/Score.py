@@ -1,6 +1,6 @@
 import math
-from Indexer import Indexer
-from Bigram import Bigram
+from Phase1.Indexer import Indexer
+from Phase1.Bigram import Bigram
 
 
 class Score:
