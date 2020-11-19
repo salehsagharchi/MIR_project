@@ -2,6 +2,7 @@ import click
 
 from Phase1 import Parser
 from Phase1.Parser import TextNormalizer as Normalizer
+from Phase1 import Constants
 
 
 def prompt_from_list(options: list, prompt_msg="Please Select One Option"):
@@ -33,7 +34,6 @@ class Main:
         self.Parser.parse_wiki()
         self.Parser.parse_tedtalks()
 
-
     def stopword_remove(self):
         self.Parser.remove_stopwords("fa")
         self.Parser.remove_stopwords("en")
@@ -63,8 +63,6 @@ class Main:
                 command()
 
 
-
-
 if __name__ == "__main__":
-    my_main = Main("data", "data/parsed_docs", "data/raw_data/ted_talks.csv", "data/raw_data/Persian.xml")
+    my_main = Main(Constants.stopword_dir, Constants.docs_dir, Constants.tedtalks_raw, Constants.wiki_raw)
     my_main.start()
