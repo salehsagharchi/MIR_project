@@ -3,14 +3,21 @@ import pickle
 
 from Phase1.DataModels import Document
 from Phase1 import Bigram
+from Phase1 import Compressor
 
 
 class Indexer:
     index = {}
 
     @classmethod
-    def load_index(cls):
-        pass
+    def load_index(cls, mode):
+        compressor = Compressor.Compressor()
+        index = compressor.load_from_file(mode)
+
+    @classmethod
+    def save_index(cls, mode):
+        compressor = Compressor.Compressor()
+        compressor.save_to_file(cls.index, mode)
 
     @classmethod
     def add_document_to_index(cls, term_list: list, doc_id):
