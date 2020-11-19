@@ -54,26 +54,24 @@ class Compressor:
         return self.posintgList
 
     def gama_code_compress(self):
-        result = []
+        result = ''
         self.compressedPostingList = []
         self.diff_memory_byte = 0
         for number in self.posintgList:
             result += self.encode_gama_codes(number)
         self.diff_memory_byte = len(result) - self.SIZE_OF_INT * len(self.posintgList)
-        result = ['0'] * (self.SIZE_OF_BYTE - (len(result) % self.SIZE_OF_BYTE)) + result
+        result = '0' * (self.SIZE_OF_BYTE - (len(result) % self.SIZE_OF_BYTE)) + result
         count = 0
         while count * self.SIZE_OF_BYTE < len(result):
-            self.compressedPostingList += [int(''.join(result[count *
-                                                              self.SIZE_OF_BYTE:(count + 1) * self.SIZE_OF_BYTE]),
+            self.compressedPostingList += [int(result[count * self.SIZE_OF_BYTE:(count + 1) * self.SIZE_OF_BYTE],
                                                base=2)]
             count += 1
-        self.diff_memory_byte = self.calculate_diff_memory_size(len(result) / self.SIZE_OF_BYTE, len(self.posintgList))
         return self.compressedPostingList
 
     @staticmethod
     def encode_gama_codes(number):
         if number == 1:
-            return 0
+            return '0'
         bin_number = bin(number)[3:]
         length_string = '1' * (len(bin_number))
         length_string += '0'
@@ -154,3 +152,12 @@ class Compressor:
                 dic = self.decompress(mode, dic)
         finally:
             return dic
+
+
+a = Compressor()
+g = a.save_to_file({"term1": {1: [5, 10], 3: [2, 8, 9]},
+                    "term2": {2: [1, 3, 5, 7], 6: [4], 8: [8, 11]},
+                    }, a.VAR_BYTE_MODE)
+print(g)
+b = a.load_from_file(a.VAR_BYTE_MODE)
+print(b)

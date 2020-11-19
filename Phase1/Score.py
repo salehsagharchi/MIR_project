@@ -1,4 +1,6 @@
 import math
+from Indexer import Indexer
+from Bigram import Bigram
 
 
 class Score:
@@ -8,6 +10,9 @@ class Score:
 
     def query(self, terms):
         n = self.getN()
+        for i in range(len(terms)):
+            if not(terms[i] in Indexer.index.keys()):
+                terms[i] = Bigram.get_best_alternative(terms[i])
         vectors = [[0 for i in range(len(terms))] for j in range(n)]
         for i in range(len(terms)):
             df, documentIndex, frequencyTerm = self.collectInformationAboutTerm(terms[i])
@@ -17,7 +22,7 @@ class Score:
         for i in range(len(terms)):
             vectors[i] = self.normalizeVector(vectors[i])
         scores = self.calculateScore(self.createQueryVector(terms), vectors)
-        sorted(scores, key=lambda x : x[1])
+        sorted(scores, key=lambda x: x[1])
         result = []
         for i in range(len(scores)):
             result.append(scores[i][0])
@@ -61,10 +66,12 @@ class Score:
         return count
 
     def getN(self):
-        #TODO
-        return 10
-    def collectInformationAboutTerm(self, term):
-        #TODO
-        return 4, [], []
-        #retunr df, documentIndex, frequencyTerm
+        return Indexer.TOTAL_DOCS
 
+    def collectInformationAboutTerm(self, term):
+        df = Indexer.get_df(term)
+        documentIndex = Indexer.get_docs_containing_term(term)
+        frequencyTerm = []
+        for i in documentIndex:
+            frequencyTerm.append(Indexer.get_tf(term, i))
+        return df, documentIndex, frequencyTerm
