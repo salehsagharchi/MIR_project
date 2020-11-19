@@ -8,6 +8,7 @@ from Phase1 import Compressor
 
 class Indexer:
     index = {}
+    TOTAL_DOCS = 0
 
     @classmethod
     def load_index(cls, mode):
@@ -38,6 +39,7 @@ class Indexer:
                 with open(file_path, 'rb') as f:
                     doc: Document = pickle.load(f)
                     cls.add_document_to_index(doc.tokens, doc.docid)
+                    cls.TOTAL_DOCS += 1
 
     @classmethod
     def delete_document_from_index(cls, term_list: list, doc_id):
