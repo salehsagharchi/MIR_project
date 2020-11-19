@@ -1,9 +1,10 @@
 import os
 import pickle
 
-from Phase1.DataModels import Document
-from Phase1 import Bigram
-from Phase1 import Compressor
+from DataModels import Document
+from Bigram import Bigram
+from Compressor import Compressor
+from Score import Score
 
 
 class Indexer:
@@ -12,12 +13,12 @@ class Indexer:
 
     @classmethod
     def load_index(cls, mode):
-        compressor = Compressor.Compressor()
-        index = compressor.load_from_file(mode)
+        compressor = Compressor()
+        cls.index = compressor.load_from_file(mode)
 
     @classmethod
     def save_index(cls, mode):
-        compressor = Compressor.Compressor()
+        compressor = Compressor()
         compressor.save_to_file(cls.index, mode)
 
     @classmethod
@@ -25,7 +26,7 @@ class Indexer:
         for i, term in enumerate(term_list):
             if cls.index.get(term) is None:
                 cls.index[term] = {doc_id: [i]}
-                Bigram.Bigram.add_term_to_bigram(term)
+                Bigram.add_term_to_bigram(term)
             elif cls.index[term].get(doc_id) is None:
                 cls.index[term][doc_id] = [i]
             else:
@@ -49,7 +50,7 @@ class Indexer:
                     del cls.index[term][doc_id]
                     if len(cls.index[term]) == 0:
                         del cls.index[term]
-                        Bigram.Bigram.delete_term_from_bigram(term)
+                        Bigram.delete_term_from_bigram(term)
 
     @classmethod
     def delete_doc_file_from_index(cls, path):
@@ -81,5 +82,8 @@ class Indexer:
         return len(cls.index[term][doc_id])
 
 
-# if __name__ == '__main__':
-#     pass
+if __name__ == '__main__':
+    Indexer.load_index(Compressor.VAR_BYTE_MODE)
+    score = Score()
+    res = score.query('کشور ایران آسیا'.split(' '))
+    print(res)

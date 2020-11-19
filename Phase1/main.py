@@ -41,7 +41,7 @@ def main():
     #job = prompt_from_list(main_jobs, "Please select a job you want to execute : ")
 
     #Parser.remove_stopwords("fa")
-    Parser.parse_tedtalks()
+    Parser.parse_wiki()
     #Parser.remove_stopwords("en")
 
 

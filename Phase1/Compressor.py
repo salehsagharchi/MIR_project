@@ -3,6 +3,9 @@ import pickle
 
 
 class Compressor:
+    VAR_BYTE_MODE = 0
+    GAMA_CODES_MODE = 1
+
     def __init__(self):
         self.posintgList = []
         self.compressedPostingList = []
@@ -152,12 +155,3 @@ class Compressor:
                 dic = self.decompress(mode, dic)
         finally:
             return dic
-
-
-a = Compressor()
-g = a.save_to_file({"term1": {1: [5, 10], 3: [2, 8, 9]},
-                    "term2": {2: [1, 3, 5, 7], 6: [4], 8: [8, 11]},
-                    }, a.VAR_BYTE_MODE)
-print(g)
-b = a.load_from_file(a.VAR_BYTE_MODE)
-print(b)
