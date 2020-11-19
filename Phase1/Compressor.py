@@ -16,6 +16,8 @@ class Compressor:
         self.SIZE_OF_BYTE = 8
         self.VAR_BYTE_MODE = 0
         self.GAMA_CODES_MODE = 1
+        self.posting_file = None
+        self.term_file = None
 
     def var_byte_compress(self):
         size_of_Result = 0
@@ -30,6 +32,8 @@ class Compressor:
 
     def encode_var_byte(self, number):
         result = []
+        # print(number)
+        number = int(number)
         result += ((number % self.module) + 128).to_bytes(1, "little")
         number = number >> self.module_size
         while number != 0:
@@ -118,12 +122,19 @@ class Compressor:
 
     def compress(self, mode, dic):
         for term in dic.keys():
+            self.term_file.write(bytes(";", "utf-8"))
+            self.term_file.write(bytes(term, "utf-8"))
             currentTerm = dic[term]
-            for document in currentTerm.keys():
+            currentTermKeys = list(currentTerm)
+            self.posting_file.write(bytearray([0x41, 0x41]))
+            self.posting_file.write(bytearray(self.compress_arr(mode, currentTermKeys)))
+            for document in currentTermKeys:
                 currentArr = currentTerm[document]
                 compressedArr = self.compress_arr(mode, currentArr)
-                dic[term][document] = bytearray(compressedArr)
-        return dic
+                self.posting_file.write(bytearray([0x42, 0x42]))
+                self.posting_file.write(bytearray(compressedArr))
+        self.posting_file.flush()
+        self.term_file.flush()
 
     def decompress(self, mode, compressedDic):
         for term in compressedDic.keys():
@@ -134,24 +145,37 @@ class Compressor:
                 compressedDic[term][document] = currentArr
         return compressedDic
 
-    def save_to_file(self, dic, mode, path=".\\data\\postingListData"):
-        with open(path + 'WithoutCompress.pkl', 'wb') as f:
-            pickle.dump(dic, f, pickle.HIGHEST_PROTOCOL)
-            f.flush()
-            f.close()
-        compressedDic = self.compress(mode, dic)
-        with open(path + '.pkl', 'wb') as f:
-            pickle.dump(compressedDic, f, pickle.HIGHEST_PROTOCOL)
-            f.flush()
-            f.close()
-        return os.path.getsize(path + 'WithoutCompress.pkl'), os.path.getsize(path + '.pkl')
+    def save_to_file(self, dic, mode, posintg_path=".\\data\\postingListData", term_path=".\\data\\termData"):
+        try:
+            self.posting_file = open(posintg_path, 'wb')
+            self.term_file = open(term_path, "wb")
+            with open(posintg_path + 'WithoutCompress.pkl', 'wb') as f:
+                pickle.dump(dic, f, pickle.DEFAULT_PROTOCOL)
+                f.flush()
+                f.close()
+            self.compress(mode, dic)
 
-    def load_from_file(self, mode, path=".\\data\\postingListData"):
+        finally:
+            self.term_file.close()
+            self.posting_file.close()
+            return os.path.getsize(posintg_path + 'WithoutCompress.pkl'), (os.path.getsize(posintg_path) +
+                                                                           os.path.getsize(term_path))
+
+    def load_from_file(self, mode, posting_path=".\\data\\postingListData", term_path=".\\data\\termData"):
         dic = {}
         try:
-            with open(path + '.pkl', 'rb') as f:
-                dic = pickle.load(f)
-                f.close()
-                dic = self.decompress(mode, dic)
+            self.term_file = open(term_path, "rb")
+            terms = self.term_file.read().decode("utf-8").split(';')[1:]
+            self.posting_file = open(posting_path, "rb")
+            termsInformation = self.posting_file.read().split(bytearray([0x41, 0x41]))[1:]
+            for i in range(len(termsInformation)):
+                currentTermInfo = termsInformation[i].split(bytearray([0x42, 0x42]))
+                documentsId = self.decompress_arr(mode, currentTermInfo[0])
+                currentTermDic = {}
+                for j in range(len(documentsId)):
+                    currentTermDic[documentsId[j]] = self.decompress_arr(mode, currentTermInfo[j + 1])
+                dic[terms[i]] = currentTermDic
         finally:
+            self.term_file.close()
+            self.posting_file.close()
             return dic
