@@ -1,17 +1,12 @@
-import arabic_reshaper
 import click
-from bidi.algorithm import get_display
 
 from Phase1 import Parser
-from Phase1 import Bigram
-from Phase1 import Indexer
-
-reshape_persian_words = True
+from Phase1.Parser import TextNormalizer as Normalizer
 
 
 def prompt_from_list(options: list, prompt_msg="Please Select One Option"):
     n = len(options)
-    click.secho(":: ", nl=False, fg="green")
+    click.secho("\n:: ", nl=False, fg="green")
     click.echo(prompt_msg)
     for i in range(1, n + 1):
         click.secho(" " + str(i) + " ", nl=False, fg="blue")
@@ -21,29 +16,55 @@ def prompt_from_list(options: list, prompt_msg="Please Select One Option"):
         type=click.IntRange(1, n),
         prompt_suffix="",
     )
+    print("\n")
     return choice - 1
 
 
-def reshape_text(raw_str, lang, reshape=reshape_persian_words):
-    if lang != "fa":
-        return raw_str
-    if not reshape:
-        return raw_str
-    reshaped_text = arabic_reshaper.reshape(raw_str)
-    return get_display(reshaped_text)
+class Main:
+
+    def __init__(self, stopword_dir: str, docs_dir: str, tedtalks_raw: str, wiki_raw: str):
+        self.stopword_dir = stopword_dir
+        self.docs_dir = docs_dir
+        self.tedtalks_raw = tedtalks_raw
+        self.wiki_raw = wiki_raw
+        self.Parser: Parser.DocParser = Parser.DocParser(stopword_dir, docs_dir, tedtalks_raw, wiki_raw)
+
+    def parsing_files(self):
+        self.Parser.parse_wiki()
+        self.Parser.parse_tedtalks()
 
 
-def main():
-    welcome_text = "با سلام به این برنامه خوش آمدید."
-    print(reshape_text(welcome_text, "fa"))
+    def stopword_remove(self):
+        self.Parser.remove_stopwords("fa")
+        self.Parser.remove_stopwords("en")
 
-    main_jobs = ["Parsing Raw Files and Generating Documents", "Remove Stopwords", "Make Positional Index"]
-    #job = prompt_from_list(main_jobs, "Please select a job you want to execute : ")
+    def start(self):
+        welcome_text = "با سلام به این برنامه خوش آمدید"
+        print(Normalizer.reshape_text(welcome_text, "fa"))
+        finish = False
+        while not finish:
+            main_jobs = {
+                "Parsing raw files and generating documents": self.parsing_files,
+                "Removing stopwords": self.stopword_remove,
+                "Make positional index": 3,
+                "Enter a term and see its positional index": 4,
+                "Bigram searching": 5,
+                "Compressing indexes via VariableByte": 6,
+                "Compressing indexes via GammaCode": 7,
+                "Query correction": 8,
+                "Search through documents": 9,
+                "EXIT": -1
+            }
 
-    #Parser.remove_stopwords("fa")
-    Parser.parse_wiki()
-    #Parser.remove_stopwords("en")
+            job = prompt_from_list(list(main_jobs), "Please select a job you want to execute : ")
+            command = list(main_jobs.values())[job]
+            finish = command == -1
+            if callable(command):
+                command()
+
+
 
 
 if __name__ == "__main__":
-    main()
+    my_main = Main("data", "data/parsed_docs", "data/raw_data/ted_talks.csv", "data/raw_data/Persian.xml")
+    my_main.start()
