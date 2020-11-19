@@ -62,6 +62,15 @@ class Indexer:
         return len(cls.index[term])
 
     @classmethod
+    def get_docs_containing_term(cls, term):
+        if cls.index.get(term) is None:
+            return []
+        res = []
+        for doc_id in cls.index[term]:
+            res.append(doc_id)
+        return res
+
+    @classmethod
     def get_tf(cls, term, doc_id):
         if cls.index.get(term) is None:
             return 0
