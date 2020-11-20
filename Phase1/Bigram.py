@@ -1,17 +1,17 @@
 import pickle
+from Phase1 import Constants
 
 
 class Bigram:
     bigram_set = {}
-    FILE_NAME = 'data/bigrams.pkl'
 
     @classmethod
     def load_file(cls):
         try:
-            with open(cls.FILE_NAME, 'rb') as f:
+            with open(Constants.bigram_file_path, 'rb') as f:
                 cls.bigram_set = pickle.load(f)
         except FileNotFoundError:
-            with open(cls.FILE_NAME, 'wb') as f:
+            with open(Constants.bigram_file_path, 'wb') as f:
                 pickle.dump({}, f, pickle.HIGHEST_PROTOCOL)
 
     @classmethod
@@ -36,7 +36,7 @@ class Bigram:
 
     @classmethod
     def save_to_file(cls):
-        with open(cls.FILE_NAME, 'wb') as f:
+        with open(Constants.bigram_file_path, 'wb') as f:
             pickle.dump(cls.bigram_set, f, pickle.HIGHEST_PROTOCOL)
 
     @classmethod
