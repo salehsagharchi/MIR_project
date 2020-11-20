@@ -63,11 +63,12 @@ class Main:
 
     def get_posting_list(self):
         term = input("please enter a term: ")
-        if len(term.split(' ')) != 1:
+        term_norm = self.parser.prepare_query(term)[0]
+        if len(term_norm) != 1:
             print("invalid input, please enter only one term")
             return
-        term_norm = self.parser.prepare_query(term)[0]
-        res = Indexer.get_docs_containing_term(term_norm)
+        term = term_norm[0]
+        res = Indexer.get_docs_containing_term(term)
         if len(res) > 0:
             print(f"the term \"{term}\" has occurred in documents: {res}")
         else:
@@ -75,16 +76,17 @@ class Main:
 
     def get_positional_index(self):
         term = input("please enter a term: ")
-        if len(term.split(' ')) != 1:
+        term_norm = self.parser.prepare_query(term)[0]
+        if len(term_norm) != 1:
             print("invalid input, please enter only one term")
             return
-        term_norm = self.parser.prepare_query(term)[0]
-        if Indexer.index.get(term_norm) is not None:
+        term = term_norm[0]
+        if Indexer.index.get(term) is not None:
             print("doc id\tpositions")
-            for posting in Indexer.index[term_norm].keys():
-                print(f"{posting}\t{Indexer.index[term_norm][posting]}")
+            for posting in Indexer.index[term].keys():
+                print(f"{posting}\t{Indexer.index[term][posting]}")
         else:
-            print(f"the term \"{term_norm}\" doesn't exist in index")
+            print(f"the term \"{term}\" doesn't exist in index")
 
     def save_via_var_byte(self):
         Preferences.pref[Constants.pref_compression_type_key] = Constants.VAR_BYTE_MODE

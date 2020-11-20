@@ -134,8 +134,6 @@ class DocParser:
         with open(stopwords_path[1], "rb") as file:
             stopwords.extend(pickle.load(file))
 
-        print(stopwords)
-
         tokens = nltk.tokenize.word_tokenize(text)
         all_tokens = []
         to_show = []
