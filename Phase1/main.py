@@ -107,8 +107,8 @@ class Main:
             "Bigram searching": self.bigram_search,
             "Compressing indexes via VariableByte": self.save_via_var_byte,
             "Compressing indexes via GammaCode": self.save_via_gama_codes,
-            "Query correction": self.query,
-            "Search through documents": 9,
+            "Query correction": 9,
+            "Search through documents": self.query,
             "Save": self.save,
             "EXIT": -1
         }
