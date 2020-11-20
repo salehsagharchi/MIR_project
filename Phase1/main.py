@@ -59,7 +59,7 @@ class Main:
 
     def create_index(self):
         Indexer.add_files()
-        print("positional index was created successfully")
+        print("positional index was created successfully!")
 
     def get_posting_list(self):
         term = input("please enter a term: ")
@@ -104,6 +104,22 @@ class Main:
         print("used space before compression: " + str(space[0]))
         print("used space after compression: " + str(space[1]))
 
+    def jaccard(self):
+        terms = input("please enter 2 terms separated by space: ").split(' ')
+        if len(terms) != 2:
+            print("invalid input")
+            return
+        bi_set1 = set([terms[0][i:i + 2] for i in range(len(terms[0]) - 1)])
+        bi_set2 = set([terms[1][i:i + 2] for i in range(len(terms[1]) - 1)])
+        print(f"Jaccard similarity between \"{terms[0]}\" and \"{terms[1]}\" is: {Bigram.jaccard_measure(bi_set1, bi_set2)}")
+
+    def edit_distance(self):
+        terms = input("please enter 2 terms separated by space: ").split(' ')
+        if len(terms) != 2:
+            print("invalid input")
+            return
+        print(f"Edit distance for \"{terms[0]}\" and \"{terms[1]}\" is: {Bigram.edit_distance_measure(terms[0], terms[1])}")
+
     def query(self):
         queryStatement = input("pls enter your query: ")
         score = Score()
@@ -115,10 +131,10 @@ class Main:
             print(result[0:min(10, len(result))])
 
     def save(self):
-        #TODO : print something
         Preferences.save_pref()
         Indexer.save_index()
         Bigram.save_bigram()
+        print("files were saved successfully!")
 
     def start(self):
         welcome_text = "با سلام به این برنامه خوش آمدید"
@@ -132,6 +148,8 @@ class Main:
             "Bigram searching": self.bigram_search,
             "Compressing indexes via VariableByte": self.save_via_var_byte,
             "Compressing indexes via GammaCode": self.save_via_gama_codes,
+            "Jaccard similarity for 2 terms": self.jaccard,
+            "Edit distance for 2 terms": self.edit_distance,
             "Search through documents": self.query,
             "Save everything": self.save,
             "EXIT": -1
