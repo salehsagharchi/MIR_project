@@ -100,9 +100,9 @@ class Main:
 
     def query(self):
         queryStatement = input("pls enter your query: ")
-        queryStatement = queryStatement.split(' ')
+        queryTokens = self.parser.prepare_query(queryStatement)[0]
         score = Score()
-        print(score.query(queryStatement)[0:10])
+        print(score.query(queryTokens)[0:10])
 
     def save(self):
         Preferences.save_pref()
