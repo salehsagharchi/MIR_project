@@ -55,7 +55,7 @@ class Bigram:
         return intersection / (len(base_bigrams) + len(term_bigrams) - intersection)
 
     @classmethod
-    def nearest_terms_wrt_jaccard_measure(cls, term, threshold=0.5):
+    def nearest_terms_wrt_jaccard_measure(cls, term, threshold=0.2):
         set_of_terms = set()
         for i in range(len(term) - 1):
             bi = term[i:i + 2]
