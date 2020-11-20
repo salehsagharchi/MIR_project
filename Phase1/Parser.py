@@ -2,6 +2,7 @@ import os.path
 import pickle
 import re
 import string
+import unicodedata
 import xml.etree.ElementTree as Xml
 
 import arabic_reshaper
@@ -35,6 +36,30 @@ class TextNormalizer:
         if lang == "fa":
             return TextNormalizer.prepare_persian_text(text, tokenize)
         return TextNormalizer.prepare_english_text(text, tokenize)
+
+    @staticmethod
+    def get_word_language(text):
+        farsi = False
+        i = 0
+        for ch in text:
+            i += 1
+            name = unicodedata.name(ch).lower()
+            if 'arabic' in name or 'farsi' in name or 'persian' in name:
+                farsi = True
+                break
+            if i == 10:
+                break
+        return "fa" if farsi else "en"
+
+    @staticmethod
+    def prepare_query(text):
+        tokens = nltk.tokenize.word_tokenize(text)
+        all_tokens = []
+        for t in tokens:
+            temp = TextNormalizer.prepare_text(t, TextNormalizer.get_word_language(t))
+            if temp:
+                all_tokens.extend(temp)
+        return all_tokens
 
     @staticmethod
     def prepare_english_text(text, tokenize):
