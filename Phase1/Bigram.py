@@ -1,5 +1,6 @@
 import pickle
 from Phase1 import Constants
+import random
 
 
 class Bigram:
@@ -86,7 +87,7 @@ class Bigram:
     def get_best_alternative(cls, term):
         nearest_terms = cls.nearest_terms_wrt_jaccard_measure(term)
         if len(nearest_terms) == 0:
-            return term
+            return None
         distances = [0 for _ in range(len(nearest_terms))]
         for i in range(len(nearest_terms)):
             distances[i] = cls.edit_distance_measure(term, nearest_terms[i])
@@ -97,6 +98,4 @@ class Bigram:
             if distances[i] == min_distance:
                 best.append(nearest_terms[i])
 
-        if len(best) == 1:
-            return best[0]
-        return best
+        return random.choice(best)
