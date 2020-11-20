@@ -52,16 +52,6 @@ class TextNormalizer:
         return "fa" if farsi else "en"
 
     @staticmethod
-    def prepare_query(text):
-        tokens = nltk.tokenize.word_tokenize(text)
-        all_tokens = []
-        for t in tokens:
-            temp = TextNormalizer.prepare_text(t, TextNormalizer.get_word_language(t))
-            if temp:
-                all_tokens.extend(temp)
-        return all_tokens
-
-    @staticmethod
     def prepare_english_text(text, tokenize):
         t = text.casefold()
         t = TextNormalizer.regex_en_space.sub(' ', t)
@@ -130,6 +120,34 @@ class DocParser:
                 print(toprint)
                 if not click.confirm('\nDo you want to continue ?'):
                     break
+
+    def prepare_query(self, text):
+        stopwords_path = [f"{self.stopword_dir}/stopwords_en.o", f"{self.stopword_dir}/stopwords_fa.o"]
+        stopwords = []
+        if not os.path.isfile(stopwords_path[0]) or not os.path.isfile(stopwords_path[1]):
+            print("Stopwords file not found, try to make that.")
+            return None
+
+        with open(stopwords_path[0], "rb") as file:
+            stopwords = pickle.load(file)
+
+        with open(stopwords_path[1], "rb") as file:
+            stopwords.extend(pickle.load(file))
+
+        print(stopwords)
+
+        tokens = nltk.tokenize.word_tokenize(text)
+        all_tokens = []
+        to_show = []
+        for t in tokens:
+            lang = TextNormalizer.get_word_language(t)
+            temp = TextNormalizer.prepare_text(t, lang)
+            temp = list(filter(lambda x: x not in stopwords, temp))
+            if temp:
+                temp_toshow = list(map(lambda x: TextNormalizer.reshape_text(x, lang), temp))
+                to_show.extend(temp_toshow)
+                all_tokens.extend(temp)
+        return all_tokens, TextNormalizer.reshape_text(" ".join(all_tokens), "fa")
 
     def parse_tedtalks(self, dump=True):
         print("Start parsing ted documents ...")
