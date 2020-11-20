@@ -6,7 +6,7 @@ from Phase1.Bigram import Bigram
 class Score:
     def __init__(self):
         self.id = 0
-        self.baseLog = 10
+        self.baseLog = 2
 
     def query(self, terms):
         n = self.getN()
@@ -17,8 +17,8 @@ class Score:
         for i in range(len(terms)):
             df, documentIndex, frequencyTerm = self.collectInformationAboutTerm(terms[i])
             for j in range(len(documentIndex)):
-                if j not in list(vectors):
-                    vectors[documentIndex[j]] = [0] * len(terms)
+                if documentIndex[j] not in list(vectors):
+                    vectors[documentIndex[j]] = [0 for k in range(len(terms))]
                 vectors[documentIndex[j]][i] = (1 + math.log(frequencyTerm[j], self.baseLog)) * math.log(n / df,
                                                                                                          self.baseLog)
                 # vectors[documentIndex[j]][i] = (1 + math.log(frequencyTerm[j], self.baseLog)) * math.log(n / df,

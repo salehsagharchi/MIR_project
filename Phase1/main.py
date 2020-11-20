@@ -90,20 +90,22 @@ class Main:
 
     def save_via_var_byte(self):
         Preferences.pref[Constants.pref_compression_type_key] = Constants.VAR_BYTE_MODE
+        Preferences.save_pref()
         space = Indexer.save_index()
         print("used space before compression: " + str(space[0]))
         print("used space after compression: " + str(space[1]))
 
     def save_via_gama_codes(self):
         Preferences.pref[Constants.pref_compression_type_key] = Constants.GAMA_CODES_MODE
+        Preferences.save_pref()
         space = Indexer.save_index()
         print("used space before compression: " + str(space[0]))
         print("used space after compression: " + str(space[1]))
 
     def query(self):
         queryStatement = input("pls enter your query: ")
-        queryTokens = self.parser.prepare_query(queryStatement)[0]
         score = Score()
+        queryTokens = self.parser.prepare_query(queryStatement)[0]
         print(score.query(queryTokens)[0:10])
 
     def save(self):
