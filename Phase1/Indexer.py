@@ -1,6 +1,8 @@
 import os
 import pickle
 
+import click
+
 from Phase1.DataModels import Document
 from Phase1.Bigram import Bigram
 from Phase1.Compressor import Compressor
@@ -39,13 +41,15 @@ class Indexer:
     @classmethod
     def add_files(cls, docs_dir=Constants.docs_dir):
         cls.index.clear()
-        cls.TOTAL_DOCS = len(os.listdir(Constants.docs_dir))
-        for filename in os.listdir(docs_dir):
-            if filename.endswith('.o'):
-                file_path = os.path.join(docs_dir, filename)
-                with open(file_path, 'rb') as f:
-                    doc: Document = pickle.load(f)
-                    cls.add_document_to_index(doc.tokens, doc.docid)
+        cls.TOTAL_DOCS = len(os.listdir(docs_dir))
+        with click.progressbar(label='Creating indexes from docs', length=cls.TOTAL_DOCS, fill_char="█") as bar:
+            for filename in os.listdir(docs_dir):
+                if filename.endswith('.o'):
+                    file_path = os.path.join(docs_dir, filename)
+                    with open(file_path, 'rb') as f:
+                        doc: Document = pickle.load(f)
+                        cls.add_document_to_index(doc.tokens, doc.docid)
+                bar.update(1)
 
     @classmethod
     def delete_document_from_index(cls, term_list: list, doc_id):
