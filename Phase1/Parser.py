@@ -117,9 +117,9 @@ class DocParser:
                         map_object = map(lambda x: TextNormalizer.reshape_text(x, lang), doc.tokens)
                         new_list = list(map_object)
                         toprint += str(new_list)
-                print(toprint)
-                if not click.confirm('\nDo you want to continue ?'):
-                    break
+                    print(toprint)
+                    if not click.confirm('\nDo you want to continue ?'):
+                        break
 
     def prepare_query(self, text):
         stopwords_path = [f"{self.stopword_dir}/stopwords_en.o", f"{self.stopword_dir}/stopwords_fa.o"]
