@@ -32,7 +32,6 @@ class Compressor:
 
     def encode_var_byte(self, number):
         result = []
-        # print(number)
         number = int(number)
         result += ((number % self.module) + 128).to_bytes(1, "little")
         number = number >> self.module_size
@@ -106,7 +105,13 @@ class Compressor:
         return self.posintgList
 
     def compress_arr(self, mode, arr):
-        self.posintgList = arr
+        self.posintgList = []
+        if mode == Compressor.GAMA_CODES_MODE:
+            for i in range(len(arr)):
+                self.posintgList.append(int(arr[i]) + 2)
+        else:
+            for i in range(len(arr)):
+                self.posintgList.append(arr[i])
         if mode == self.VAR_BYTE_MODE:
             self.var_byte_compress()
         elif mode == self.GAMA_CODES_MODE:
@@ -119,7 +124,10 @@ class Compressor:
             self.var_byte_decompress()
         elif mode == self.GAMA_CODES_MODE:
             self.gama_codes_decompress()
+            for i in range(len(self.posintgList)):
+                self.posintgList[i] -= 2
         return self.posintgList
+
 
     def compress(self, mode, dic):
         for term in dic.keys():
