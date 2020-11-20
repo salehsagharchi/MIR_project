@@ -86,7 +86,7 @@ class Bigram:
     def get_best_alternative(cls, term):
         nearest_terms = cls.nearest_terms_wrt_jaccard_measure(term)
         if len(nearest_terms) == 0:
-            return None
+            return term
         distances = [0 for _ in range(len(nearest_terms))]
         for i in range(len(nearest_terms)):
             distances[i] = cls.edit_distance_measure(term, nearest_terms[i])
