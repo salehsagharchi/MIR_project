@@ -4,7 +4,7 @@ from Phase1.Parser import TextNormalizer as Normalizer
 from Phase1 import Constants
 from Phase1.Bigram import Bigram
 from Phase1.Indexer import Indexer
-
+from Phase1.Score import Score
 
 def prompt_from_list(options: list, prompt_msg="Please Select One Option"):
     n = len(options)
@@ -75,6 +75,22 @@ class Main:
         else:
             print(f"the term \"{term}\" doesn't exist in index")
 
+    def save_via_var_byte(self):
+        space = Indexer.save_index(Constants.VAR_BYTE_MODE)
+        print("used space before compression: " + str(space[0]))
+        print("used space after compression: " + str(space[1]))
+
+    def save_via_gama_codes(self):
+        space = Indexer.save_index(Constants.GAMA_CODES_MODE)
+        print("used space before compression: " + str(space[0]))
+        print("used space after compression: " + str(space[1]))
+
+    def query(self):
+        queryStatement = input("pls enter your query: ")
+        queryStatement = queryStatement.split(' ')
+        score = Score()
+        print(score.query(queryStatement)[0:10])
+
     def save(self):
         Indexer.save_index()
         Bigram.save_to_file()
@@ -89,9 +105,9 @@ class Main:
             "Enter a term and see its posting list": self.get_posting_list,
             "Enter a term and see its positional index": self.get_positional_index,
             "Bigram searching": self.bigram_search,
-            "Compressing indexes via VariableByte": 6,
-            "Compressing indexes via GammaCode": 7,
-            "Query correction": 8,
+            "Compressing indexes via VariableByte": self.save_via_var_byte,
+            "Compressing indexes via GammaCode": self.save_via_gama_codes,
+            "Query correction": self.query,
             "Search through documents": 9,
             "Save": self.save,
             "EXIT": -1
