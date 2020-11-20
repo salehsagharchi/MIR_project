@@ -73,7 +73,10 @@ class TextNormalizer:
                 t = t.replace(ch, tup[1])
         t = TextNormalizer.regex_fa_space.sub(' ', t)
         t = TextNormalizer.regex_fa_none.sub('', t)
-        tokens = hazm.word_tokenize(t)
+        tokens2 = hazm.word_tokenize(t)
+        tokens = []
+        for x in tokens2:
+            tokens.extend(x.split("_"))
         stemmed_tokens = []
         for x in tokens:
             word = TextNormalizer.stemmer.stem(x)
@@ -182,18 +185,15 @@ class DocParser:
         stopword_threshold = 0.0072
 
         stopwords_path = f"{self.stopword_dir}/stopwords_en.o"
-        if os.path.isfile(stopwords_path):
-            with open(stopwords_path, "rb") as file:
-                stopwords = pickle.load(file)
-        else:
-            sorted_word = {k: v for k, v in sorted(all_tokens.items(), key=lambda item: item[1], reverse=True)}
-            for i, key in enumerate(sorted_word):
-                if (sorted_word[key] / tokens_count) >= stopword_threshold:
-                    stopwords.append(key)
-                else:
-                    break
-            with open(stopwords_path, "wb") as file:
-                pickle.dump(stopwords, file)
+
+        sorted_word = {k: v for k, v in sorted(all_tokens.items(), key=lambda item: item[1], reverse=True)}
+        for i, key in enumerate(sorted_word):
+            if (sorted_word[key] / tokens_count) >= stopword_threshold:
+                stopwords.append(key)
+            else:
+                break
+        with open(stopwords_path, "wb") as file:
+            pickle.dump(stopwords, file)
 
         print("Calculated stopwords :", stopwords)
         print("Token counts :", tokens_count)
@@ -235,18 +235,15 @@ class DocParser:
         stopword_threshold = 0.006
 
         stopwords_path = f"{self.stopword_dir}/stopwords_fa.o"
-        if os.path.isfile(stopwords_path):
-            with open(stopwords_path, "rb") as file:
-                stopwords = pickle.load(file)
-        else:
-            sorted_word = {k: v for k, v in sorted(all_tokens.items(), key=lambda item: item[1], reverse=True)}
-            for i, key in enumerate(sorted_word):
-                if (sorted_word[key] / tokens_count) >= stopword_threshold:
-                    stopwords.append(key)
-                else:
-                    break
-            with open(stopwords_path, "wb") as file:
-                pickle.dump(stopwords, file)
+
+        sorted_word = {k: v for k, v in sorted(all_tokens.items(), key=lambda item: item[1], reverse=True)}
+        for i, key in enumerate(sorted_word):
+            if (sorted_word[key] / tokens_count) >= stopword_threshold:
+                stopwords.append(key)
+            else:
+                break
+        with open(stopwords_path, "wb") as file:
+            pickle.dump(stopwords, file)
 
         map_object = map(lambda x: TextNormalizer.reshape_text(x, "fa"), stopwords)
         new_list = list(map_object)

@@ -1,11 +1,15 @@
+import os
+import pickle
 import click
 from Phase1 import Parser
-from Phase1.Parser import TextNormalizer as Normalizer
+from Phase1.Parser import TextNormalizer as Normalizer, TextNormalizer
 from Phase1 import Constants
 from Phase1.Bigram import Bigram
 from Phase1.Indexer import Indexer
 from Phase1.Score import Score
 from Phase1.Preferences import Preferences
+from Phase1.DataModels import Document
+
 
 
 def prompt_from_list(options: list, prompt_msg="Please Select One Option"):
@@ -130,6 +134,25 @@ class Main:
         if result is not None:
             print(result[0:min(10, len(result))])
 
+    def printdoc(self):
+        docid = input("Enter a document id : ")
+        path = f"{self.docs_dir}/{docid}_fa.o"
+        if not os.path.isfile(path):
+            path = f"{self.docs_dir}/{docid}_en.o"
+
+        if not os.path.isfile(path):
+            print(f"Couldn't find a document with id = {docid}")
+            return
+
+        with open(path, "rb") as file:
+            doc: Document = pickle.load(file)
+            title = TextNormalizer.reshape_text(doc.title, "fa")
+            toprint = f"\nDocument #{doc.docid} with title : {title}\n"
+            map_object = map(lambda x: TextNormalizer.reshape_text(x, "fa"), doc.tokens)
+            new_list = list(map_object)
+            toprint += str(new_list)
+        print(toprint)
+
     def save(self):
         Preferences.save_pref()
         Indexer.save_index()
@@ -145,6 +168,7 @@ class Main:
             "Make positional index": self.create_index,
             "Enter a term and see its posting list": self.get_posting_list,
             "Enter a term and see its positional index": self.get_positional_index,
+            "Enter docid and see doc details": self.printdoc,
             "Bigram searching": self.bigram_search,
             "Compressing indexes via VariableByte": self.save_via_var_byte,
             "Compressing indexes via GammaCode": self.save_via_gama_codes,
