@@ -4,6 +4,7 @@ import pickle
 from Phase1.DataModels import Document
 from Phase1.Bigram import Bigram
 from Phase1.Compressor import Compressor
+from Phase1.Preferences import Preferences
 from Phase1 import Constants
 
 
@@ -12,14 +13,16 @@ class Indexer:
     TOTAL_DOCS = 0
 
     @classmethod
-    def load_index(cls, mode=Constants.VAR_BYTE_MODE):
+    def load_index(cls):
         compressor = Compressor()
+        mode = Preferences.pref[Constants.pref_compression_type_key]
         cls.index = compressor.load_from_file(mode)
         cls.TOTAL_DOCS = len(os.listdir(Constants.docs_dir))
 
     @classmethod
-    def save_index(cls, mode=Constants.VAR_BYTE_MODE):
+    def save_index(cls):
         compressor = Compressor()
+        mode = Preferences.pref[Constants.pref_compression_type_key]
         return compressor.save_to_file(cls.index, mode)
 
     @classmethod
@@ -35,13 +38,14 @@ class Indexer:
 
     @classmethod
     def add_files(cls, docs_dir=Constants.docs_dir):
+        cls.index.clear()
+        cls.TOTAL_DOCS = len(os.listdir(Constants.docs_dir))
         for filename in os.listdir(docs_dir):
             if filename.endswith('.o'):
                 file_path = os.path.join(docs_dir, filename)
                 with open(file_path, 'rb') as f:
                     doc: Document = pickle.load(f)
                     cls.add_document_to_index(doc.tokens, doc.docid)
-                    cls.TOTAL_DOCS += 1
 
     @classmethod
     def delete_document_from_index(cls, term_list: list, doc_id):

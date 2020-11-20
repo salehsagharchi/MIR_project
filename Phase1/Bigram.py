@@ -35,7 +35,7 @@ class Bigram:
                         cls.bigram_set.pop(bi)
 
     @classmethod
-    def save_to_file(cls):
+    def save_bigram(cls):
         with open(Constants.bigram_file_path, 'wb') as f:
             pickle.dump(cls.bigram_set, f, pickle.HIGHEST_PROTOCOL)
 

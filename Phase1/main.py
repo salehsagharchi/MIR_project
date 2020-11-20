@@ -5,6 +5,8 @@ from Phase1 import Constants
 from Phase1.Bigram import Bigram
 from Phase1.Indexer import Indexer
 from Phase1.Score import Score
+from Phase1.Preferences import Preferences
+
 
 def prompt_from_list(options: list, prompt_msg="Please Select One Option"):
     n = len(options)
@@ -34,6 +36,7 @@ class Main:
     def initialize_classes(self):
         print("loading...")
         try:
+            Preferences.load_pref()
             Indexer.load_index()
             Bigram.load_file()
         except AttributeError:
@@ -76,12 +79,14 @@ class Main:
             print(f"the term \"{term}\" doesn't exist in index")
 
     def save_via_var_byte(self):
-        space = Indexer.save_index(Constants.VAR_BYTE_MODE)
+        Preferences.pref[Constants.pref_compression_type_key] = Constants.VAR_BYTE_MODE
+        space = Indexer.save_index()
         print("used space before compression: " + str(space[0]))
         print("used space after compression: " + str(space[1]))
 
     def save_via_gama_codes(self):
-        space = Indexer.save_index(Constants.GAMA_CODES_MODE)
+        Preferences.pref[Constants.pref_compression_type_key] = Constants.GAMA_CODES_MODE
+        space = Indexer.save_index()
         print("used space before compression: " + str(space[0]))
         print("used space after compression: " + str(space[1]))
 
@@ -92,8 +97,9 @@ class Main:
         print(score.query(queryStatement)[0:10])
 
     def save(self):
+        Preferences.save_pref()
         Indexer.save_index()
-        Bigram.save_to_file()
+        Bigram.save_bigram()
 
     def start(self):
         welcome_text = "با سلام به این برنامه خوش آمدید"
