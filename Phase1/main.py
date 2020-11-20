@@ -31,7 +31,7 @@ class Main:
         self.docs_dir = docs_dir
         self.tedtalks_raw = tedtalks_raw
         self.wiki_raw = wiki_raw
-        self.Parser: Parser.DocParser = Parser.DocParser(stopword_dir, docs_dir, tedtalks_raw, wiki_raw)
+        self.parser: Parser.DocParser = Parser.DocParser(stopword_dir, docs_dir, tedtalks_raw, wiki_raw)
 
     def initialize_classes(self):
         print("loading...")
@@ -43,12 +43,12 @@ class Main:
             pass
 
     def parsing_files(self):
-        self.Parser.parse_wiki()
-        self.Parser.parse_tedtalks()
+        self.parser.parse_wiki()
+        self.parser.parse_tedtalks()
 
     def stopword_remove(self):
-        self.Parser.remove_stopwords("fa")
-        self.Parser.remove_stopwords("en")
+        self.parser.remove_stopwords("fa")
+        self.parser.remove_stopwords("en")
 
     def bigram_search(self):
         bi = input("please enter a bigram: ")
