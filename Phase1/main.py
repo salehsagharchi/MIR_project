@@ -34,7 +34,7 @@ class Main:
         self.parser: Parser.DocParser = Parser.DocParser(stopword_dir, docs_dir, tedtalks_raw, wiki_raw)
 
     def initialize_classes(self):
-        print("loading...")
+        print("Loading files ...")
         try:
             Preferences.load_pref()
             Indexer.load_index()
@@ -68,6 +68,7 @@ class Main:
             print("invalid input, please enter only one term")
             return
         term = term_norm[0]
+        print("Normalized Term :", term)
         res = Indexer.get_docs_containing_term(term)
         if len(res) > 0:
             print(f"the term \"{term}\" has occurred in documents: {res}")
@@ -81,6 +82,7 @@ class Main:
             print("invalid input, please enter only one term")
             return
         term = term_norm[0]
+        print("Normalized Term :", term)
         if Indexer.index.get(term) is not None:
             print("doc id\tpositions")
             for posting in Indexer.index[term].keys():
@@ -105,10 +107,15 @@ class Main:
     def query(self):
         queryStatement = input("pls enter your query: ")
         score = Score()
-        queryTokens = self.parser.prepare_query(queryStatement)[0]
-        print(score.query(queryTokens)[0:10])
+        normalized_query = self.parser.prepare_query(queryStatement)
+        queryTokens = normalized_query[0]
+        print("Normalized query :", normalized_query[1])
+        result = score.query(queryTokens)
+        if result is not None:
+            print(result[0:min(10, len(result))])
 
     def save(self):
+        #TODO : print something
         Preferences.save_pref()
         Indexer.save_index()
         Bigram.save_bigram()
@@ -125,9 +132,8 @@ class Main:
             "Bigram searching": self.bigram_search,
             "Compressing indexes via VariableByte": self.save_via_var_byte,
             "Compressing indexes via GammaCode": self.save_via_gama_codes,
-            "Query correction": 9,
             "Search through documents": self.query,
-            "Save": self.save,
+            "Save everything": self.save,
             "EXIT": -1
         }
         finish = False

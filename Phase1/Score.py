@@ -1,6 +1,7 @@
 import math
 from Phase1.Indexer import Indexer
 from Phase1.Bigram import Bigram
+from Phase1.Parser import TextNormalizer
 
 
 class Score:
@@ -10,9 +11,17 @@ class Score:
 
     def query(self, terms):
         n = self.getN()
+        correction = False
         for i in range(len(terms)):
             if not (terms[i] in Indexer.index.keys()):
+                correction = True
                 terms[i] = Bigram.get_best_alternative(terms[i])
+        terms = list(filter(lambda x: x is not None, terms))
+        if not terms:
+            print("Cannot find a good document :)")
+            return
+        if correction:
+            print("Your query is misspelled, alternative execution is :", TextNormalizer.reshape_text(" ".join(terms), "fa"))
         vectors = {}
         for i in range(len(terms)):
             df, documentIndex, frequencyTerm = self.collectInformationAboutTerm(terms[i])
