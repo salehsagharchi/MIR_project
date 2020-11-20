@@ -77,6 +77,7 @@ class Compressor:
 
     @staticmethod
     def encode_gama_codes(number):
+        number = int(number)
         if number == 1:
             return '0'
         bin_number = bin(number)[3:]
