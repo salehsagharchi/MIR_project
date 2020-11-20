@@ -13,7 +13,7 @@ class Preferences:
                 cls.pref = pickle.load(f)
         except FileNotFoundError:
             cls.pref = {Constants.pref_compression_type_key: Constants.VAR_BYTE_MODE}
-            with open(Constants.bigram_file_path, 'wb') as f:
+            with open(Constants.preferences_path, 'wb') as f:
                 pickle.dump(cls.pref, f, pickle.HIGHEST_PROTOCOL)
 
     @classmethod
