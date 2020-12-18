@@ -9,6 +9,14 @@ class Document:
 
 
 class kNNData:
-    def __init__(self, vector: list, label):
-        self.vector = vector
+    def __init__(self, tokens: list, label):
         self.label = label
+        self.vector = dict()
+        for term in tokens:
+            if self.vector.get(term) is None:
+                self.vector[term] = 1
+            else:
+                self.vector[term] += 1
+
+    def __str__(self):
+        return str(self.label) + " : " + str(self.vector)
