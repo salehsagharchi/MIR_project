@@ -33,8 +33,8 @@ class Tester:
                             true_negative += 1
 
         result = {}
-        result[Constants.PRECISION] = true_positive / (true_positive + false_positive)
-        result[Constants.RECALL] = true_positive / (true_positive + false_negative)
-        result[Constants.ACCURACY] = (true_positive + true_negative) / (true_positive + true_negative + false_positive + false_negative)
-        result[Constants.F1] = (2 * result[Constants.PRECISION] * result[Constants.RECALL]) / (result[Constants.PRECISION] + result[Constants.RECALL])
+        result[Constants.PRECISION] = round(true_positive / (true_positive + false_positive), 6)
+        result[Constants.RECALL] = round(true_positive / (true_positive + false_negative), 6)
+        result[Constants.ACCURACY] = round((true_positive + true_negative) / (true_positive + true_negative + false_positive + false_negative), 6)
+        result[Constants.F1] = round((2 * result[Constants.PRECISION] * result[Constants.RECALL]) / (result[Constants.PRECISION] + result[Constants.RECALL]), 6)
         return result

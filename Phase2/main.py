@@ -57,7 +57,7 @@ class Main:
         print(NaiveBayesClassifier.test())
 
     def kNN_test(self):
-        k = int(input("please enter parameter k:"))
+        k = int(input("please enter parameter k: "))
         kNNClassifier.start(k)
         print(kNNClassifier.test())
 
