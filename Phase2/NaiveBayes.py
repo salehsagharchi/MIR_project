@@ -1,4 +1,10 @@
+import os
+import pickle
 from math import log, inf
+
+from Phase2 import Constants
+from Phase2.DataModels import Document
+
 
 class NaiveBayes:
     number_of_classes = 2
@@ -6,9 +12,13 @@ class NaiveBayes:
     total_terms_in_class = [0 for _ in range(number_of_classes)]
 
     @classmethod
-    def create_table(cls, documents, labels):
-        for i in range(len(documents)):
-            cls.add_doc_to_table(documents[i], labels[i])
+    def start(cls, docs_dir=Constants.docs_dir):
+        for filename in os.listdir(docs_dir):
+            if filename.endswith('.o'):
+                file_path = os.path.join(docs_dir, filename)
+                with open(file_path, 'rb') as f:
+                    doc: Document = pickle.load(f)
+                    cls.add_doc_to_table(doc.tokens, doc.view)
 
         for term_counts in cls.table.values():
             for c in range(cls.number_of_classes):
