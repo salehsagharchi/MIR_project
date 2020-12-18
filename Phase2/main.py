@@ -1,6 +1,10 @@
 import os
 import pickle
 import click
+
+import kNNClassifier
+from NaiveBayesClassifier import NaiveBayesClassifier
+from kNNClassifier import kNNClassifier
 from Phase2 import Parser
 from Phase2.Parser import TextNormalizer as Normalizer, TextNormalizer
 from Phase2 import Constants
@@ -47,6 +51,16 @@ class Main:
 
     def stopword_remove(self):
         self.parser.remove_stopwords("en")
+
+    def naive_bayes_test(self):
+        NaiveBayesClassifier.start()
+        print(NaiveBayesClassifier.test())
+
+    def kNN_test(self):
+        k = int(input("please enter parameter k:"))
+        kNNClassifier.start(k)
+        print(kNNClassifier.test())
+
 
     # def bigram_search(self):
     #     bi = input("please enter a bigram: ")
@@ -159,6 +173,8 @@ class Main:
         main_jobs = {
             "Parsing raw files and generating documents": self.parsing_files,
             "Removing stopwords": self.stopword_remove,
+            "Naive Bayes test": self.naive_bayes_test,
+            "kNN test": self.kNN_test,
             "EXIT": -1
         }
         finish = False

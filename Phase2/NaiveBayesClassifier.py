@@ -2,21 +2,22 @@ import os
 import pickle
 from math import log, inf
 
+from Phase2.Tester import Tester
 from Phase2 import Constants
 from Phase2.DataModels import Document
 
 
-class NaiveBayes:
+class NaiveBayesClassifier:
     table = dict()
     total_terms_in_class = list()
     number_of_classes = len(Constants.label_index)
 
     @classmethod
-    def start(cls, docs_dir=Constants.docs_dir):
+    def start(cls):
         cls.table.clear()
-        for filename in os.listdir(docs_dir):
+        for filename in os.listdir(Constants.docs_dir):
             if filename.endswith('train.o'):
-                file_path = os.path.join(docs_dir, filename)
+                file_path = os.path.join(Constants.docs_dir, filename)
                 with open(file_path, 'rb') as f:
                     doc: Document = pickle.load(f)
                     cls.add_doc_to_table(doc.tokens, Constants.label_index[doc.view])
@@ -56,15 +57,5 @@ class NaiveBayes:
         return best_class
 
     @classmethod
-    def test(cls, docs_dir=Constants.docs_dir):
-        correct_prediction_count = 0
-        total_tests = 0
-        for filename in os.listdir(docs_dir):
-            if filename.endswith('test.o'):
-                total_tests += 1
-                file_path = os.path.join(docs_dir, filename)
-                with open(file_path, 'rb') as f:
-                    doc: Document = pickle.load(f)
-                    if cls.classify(doc.tokens) == Constants.label_index[doc.view]:
-                        correct_prediction_count += 1
-        return correct_prediction_count / total_tests
+    def test(cls):
+        return Tester.test(Constants.naive_bayes, cls.classify)

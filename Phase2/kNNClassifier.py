@@ -4,6 +4,7 @@ from math import sqrt
 
 from Phase2.DataModels import Document, kNNData
 from Phase2 import Constants
+from Tester import Tester
 
 
 class kNNClassifier:
@@ -11,12 +12,12 @@ class kNNClassifier:
     train_data = list()
 
     @classmethod
-    def start(cls, docs_dir=Constants.docs_dir, k=1):
+    def start(cls, k=1):
         cls.k = k
         cls.train_data.clear()
-        for filename in os.listdir(docs_dir):
+        for filename in os.listdir(Constants.docs_dir):
             if filename.endswith('train.o'):
-                file_path = os.path.join(docs_dir, filename)
+                file_path = os.path.join(Constants.docs_dir, filename)
                 with open(file_path, 'rb') as f:
                     doc: Document = pickle.load(f)
                     cls.train_data.append(kNNData(doc.tokens, Constants.label_index[doc.view]))
@@ -46,16 +47,5 @@ class kNNClassifier:
         return max(set(labels), key=labels.count)
 
     @classmethod
-    def test(cls, docs_dir=Constants.docs_dir):
-        correct_prediction_count = 0
-        total_tests = 0
-        for filename in os.listdir(docs_dir):
-            if filename.endswith('test.o'):
-                total_tests += 1
-                file_path = os.path.join(docs_dir, filename)
-                with open(file_path, 'rb') as f:
-                    doc: Document = pickle.load(f)
-                    prediction = cls.classify(kNNData(doc.tokens, None))
-                    if prediction == Constants.label_index[doc.view]:
-                        correct_prediction_count += 1
-        return correct_prediction_count / total_tests
+    def test(cls):
+        return Tester.test(Constants.kNN, cls.classify)
