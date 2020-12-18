@@ -6,3 +6,9 @@ class Document:
         self.tokens = tokens
         self.is_test = is_test
         self.view = view
+
+
+class kNNData:
+    def __init__(self, vector: list, label):
+        self.vector = vector
+        self.label = label
