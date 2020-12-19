@@ -7,7 +7,7 @@ import numpy as np
 from sklearn import svm
 from sklearn.model_selection import train_test_split
 
-from Phase2.Tester import Tester, TestingType
+from Phase2.Tester import TestingType
 from Phase2 import Constants
 from Phase2.DataModels import Document
 from Phase2.VectorSpaceModel import VectorSpaceCreator

@@ -36,7 +36,15 @@ class VectorSpaceCreator:
                 else:
                     wordfreq[token] += 1
 
-        self.most_freq = heapq.nlargest(1000, wordfreq, key=wordfreq.get)
+        # self.most_freq = heapq.nlargest(10000, wordfreq, key=wordfreq.get)
+        self.most_freq = []
+        sortedwordfreq = sorted(wordfreq, key=wordfreq.get, reverse=True)
+
+        for k in sortedwordfreq:
+            if wordfreq[k] >= 20:
+                self.most_freq.append(k)
+            else:
+                break
 
         tfidf_values = []
         with click.progressbar(label=f'Making Vector Space Model', length=len(self.most_freq),
