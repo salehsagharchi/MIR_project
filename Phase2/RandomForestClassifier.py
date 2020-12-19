@@ -24,4 +24,5 @@ class RFClassifier:
             source = self.Y_test
         else:
             return None
+
         return get_test_result(list(map(int, source)), list(map(int, predicted)))

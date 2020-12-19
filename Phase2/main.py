@@ -92,7 +92,7 @@ class Main:
 
     def svm_test(self):
         if self.vector_space_model is None:
-            print("Vector space model is not ready, trying to make or load it ...")
+            print("Vector space model is not ready, attempting to create or load it ...")
             if not self.create_vector_model():
                 return
         Cs = (input("\nPlease enter your C parameters list (separated with ','): "))
@@ -102,7 +102,7 @@ class Main:
 
     def RFTest(self):
         if self.vector_space_model is None:
-            print("Vector space model is not ready, trying to make or load it ...")
+            print("Vector space model is not ready, attempting to create or load it ...")
             if not self.create_vector_model():
                 return
         rf = RFClassifier(self.vector_space_model)
