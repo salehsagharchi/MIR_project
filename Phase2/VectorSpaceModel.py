@@ -79,15 +79,28 @@ class VectorSpaceCreator:
         self.tf_idf_test = []
         for i in range(len(temp)):
             if 'test' in keys[i]:
-                self.tf_idf_test.append(temp[i] + [views[i], keys[i]])
+                self.tf_idf_test.append([float(x) for x in temp[i]] + [views[i], keys[i]])
             else:
-                self.tf_idf_train.append(temp[i] + [views[i], keys[i]])
+                self.tf_idf_train.append([float(x) for x in temp[i]] + [views[i], keys[i]])
 
         print("OK")
 
     def dumpModel(self):
         with open(f'{Constants.data_dir_root}/VectorSpaceModel.o', "wb") as file:
             pickle.dump(self, file)
+
+    def create_td_idf_for_tokens(self, tokens):
+        assert self.most_freq != [] and len(self.idfs) == len(self.most_freq)
+
+        tfidf_values = []
+        for i in range(len(self.most_freq)):
+            term_freq = 0
+            for word in tokens:
+                if self.most_freq[i] == word:
+                    term_freq += 1
+            tfidf_values.append(term_freq * self.idfs[i])
+
+        return np.array(tfidf_values)
 
     @staticmethod
     def readModel():
