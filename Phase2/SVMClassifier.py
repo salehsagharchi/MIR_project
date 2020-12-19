@@ -11,7 +11,7 @@ from Phase2.Tester import TestingType
 from Phase2 import Constants
 from Phase2.DataModels import Document
 from Phase2.VectorSpaceModel import VectorSpaceCreator
-from Utils import get_test_result
+from Phase2.Utils import get_test_result
 
 
 class SVMClassifier:
