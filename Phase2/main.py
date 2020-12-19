@@ -54,11 +54,19 @@ class Main:
 
     def naive_bayes_test(self):
         NaiveBayesClassifier.start()
-        print(NaiveBayesClassifier.test())
+        test_files = input("test on test data or train data? (default is test data)")
+        if test_files == '' or test_files != 'train':
+            test_files = 'test'
+        print(f"Naive Bayes Classification test on {test_files} data:")
+        print(NaiveBayesClassifier.test(test_files))
 
     def kNN_test(self):
         k = int(input("please enter parameter k: "))
         kNNClassifier.start(k)
+        test_files = input("test on test data or train data? (default is test data)")
+        if test_files == '' or test_files != 'train':
+            test_files = 'test'
+        print(f"kNN Classification test on {test_files} data:")
         print(kNNClassifier.test())
 
 

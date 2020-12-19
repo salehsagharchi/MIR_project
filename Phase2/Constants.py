@@ -11,3 +11,4 @@ naive_bayes = 0
 kNN = 1
 SVM = 2
 random_forest = 3
+
