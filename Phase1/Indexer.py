@@ -1,5 +1,6 @@
 import os
 import pickle
+from math import log
 
 import click
 
@@ -68,12 +69,6 @@ class Indexer:
             cls.delete_document_from_index(doc.tokens, doc.docid)
 
     @classmethod
-    def get_df(cls, term):
-        if cls.index.get(term) is None:
-            return 0
-        return len(cls.index[term])
-
-    @classmethod
     def get_docs_containing_term(cls, term):
         if cls.index.get(term) is None:
             return []
@@ -81,6 +76,18 @@ class Indexer:
         for doc_id in cls.index[term]:
             res.append(doc_id)
         return res
+
+    @classmethod
+    def get_df(cls, term):
+        if cls.index.get(term) is None:
+            return 0
+        return len(cls.index[term])
+
+    @classmethod
+    def get_idf(cls, term):
+        if cls.index.get(term) is None:
+            return 1
+        return log(cls.TOTAL_DOCS / cls.get_df(term))
 
     @classmethod
     def get_tf(cls, term, doc_id):

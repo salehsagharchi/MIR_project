@@ -1,5 +1,5 @@
 class Document:
-    def __init__(self, docid, title, raw_text, tokens, is_test: bool, view: int):
+    def __init__(self, docid: int, title, raw_text, tokens, is_test: bool, view: int):
         self.docid = docid
         self.title = title
         self.raw_text = raw_text
