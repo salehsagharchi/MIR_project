@@ -4,7 +4,6 @@ from math import sqrt, log
 
 from Phase2.DataModels import Document, kNNData
 from Phase2 import Constants
-from Phase2.Tester import Tester
 from Phase2.Utils import test_classifier
 
 
