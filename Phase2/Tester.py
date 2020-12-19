@@ -3,7 +3,13 @@ import pickle
 
 from Phase2.DataModels import Document, kNNData
 from Phase2 import Constants
+from enum import Enum
 
+
+class TestingType(Enum):
+    TRAIN = 1
+    VALIDATION = 2
+    TEST = 3
 
 class Tester:
 

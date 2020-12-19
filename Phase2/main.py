@@ -2,14 +2,14 @@ import os
 import pickle
 import click
 
-import kNNClassifier
-from NaiveBayesClassifier import NaiveBayesClassifier
-from kNNClassifier import kNNClassifier
+from Phase2.NaiveBayesClassifier import NaiveBayesClassifier
+from Phase2.VectorSpaceModel import VectorSpaceCreator
+from Phase2.kNNClassifier import kNNClassifier
 from Phase2 import Parser
 from Phase2.Parser import TextNormalizer as Normalizer, TextNormalizer
 from Phase2 import Constants
 from Phase2.DataModels import Document
-
+from Phase2.SVMClassifier import SVMClassifier
 
 
 def prompt_from_list(options: list, prompt_msg="Please Select One Option"):
@@ -36,6 +36,7 @@ class Main:
         self.tedtalks_raw_train = tedtalks_raw_train
         self.tedtalks_raw_test = tedtalks_raw_test
         self.parser: Parser.DocParser = Parser.DocParser(stopword_dir, docs_dir, tedtalks_raw_train, tedtalks_raw_test)
+        self.vector_space_model = None
 
     # def initialize_classes(self):
     #     print("Loading files ...")
@@ -61,6 +62,27 @@ class Main:
         kNNClassifier.start(k)
         print(kNNClassifier.test())
 
+    def create_vector_model(self):
+        if not os.path.isfile(f'{Constants.data_dir_root}/VectorSpaceModel.o'):
+            self.vector_space_model = VectorSpaceCreator()
+            self.vector_space_model.load_documents()
+            self.vector_space_model.make_model()
+            self.vector_space_model.dumpModel()
+            print("Vector space model created successfully !")
+        else:
+            self.vector_space_model = VectorSpaceCreator.readModel()
+            print("Vector space model loaded successfully !")
+        return True
+
+    def svm_test(self):
+        if self.vector_space_model is None:
+            print("Vector space model is not ready, tring to make or load it ...")
+            if not self.create_vector_model():
+                return
+        Cs = (input("\nPlease enter your C parameters list (seperated with ','): "))
+        clist = list(map(lambda x: x.strip(), Cs.split(",")))
+        svm = SVMClassifier(self.vector_space_model)
+        svm.batch_fiting(clist)
 
     # def bigram_search(self):
     #     bi = input("please enter a bigram: ")
@@ -173,8 +195,10 @@ class Main:
         main_jobs = {
             "Parsing raw files and generating documents": self.parsing_files,
             "Removing stopwords": self.stopword_remove,
+            "Create or load vector space model": self.create_vector_model,
             "Naive Bayes test": self.naive_bayes_test,
             "kNN test": self.kNN_test,
+            "SVM Classification": self.svm_test,
             "EXIT": -1
         }
         finish = False
@@ -187,5 +211,5 @@ class Main:
 
 
 if __name__ == "__main__":
-    my_main = Main(Constants.stopword_dir, Constants.docs_dir, Constants.tedtalks_raw_train, Constants.tedtalks_raw_test)
+    my_main = Main(Constants.data_dir_root, Constants.docs_dir, Constants.tedtalks_raw_train, Constants.tedtalks_raw_test)
     my_main.start()

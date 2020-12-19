@@ -30,6 +30,7 @@ class TextNormalizer:
     stemmer = hazm.Stemmer()
 
     regex_en_space = re.compile('[%s]' % re.escape(string.punctuation))
+    regex_en_unwanted = re.compile(r'[^A-Za-z0-9\s]+')
     porter_stemmer = nltk.stem.PorterStemmer()
 
     @staticmethod
@@ -56,6 +57,7 @@ class TextNormalizer:
     def prepare_english_text(text, tokenize):
         t = text.casefold()
         t = TextNormalizer.regex_en_space.sub(' ', t)
+        t = TextNormalizer.regex_en_unwanted.sub(' ', t)
         tokens = nltk.tokenize.word_tokenize(t)
         stemmed_tokens = []
         for x in tokens:
@@ -152,7 +154,8 @@ class DocParser:
             with open((self.tedtalks_raw_test if is_test else self.tedtalks_raw_train), encoding='Latin1') as csvfile:
                 csv_reader = list(csv.reader(csvfile, delimiter=','))
                 line_count = -1
-                with click.progressbar(label=f'Parsing Ted {"Test" if is_test else "Train"} Documents', length=len(csv_reader) + 1, fill_char="█") as bar:
+                with click.progressbar(label=f'Parsing Ted {"Test" if is_test else "Train"} Documents', length=len(csv_reader) + 1,
+                                       fill_char="█") as bar:
                     bar.update(1)
                     sleep(0.5)
                     for row in csv_reader:
@@ -163,6 +166,8 @@ class DocParser:
                         else:
                             docid = str(line_count)
                             views = int(row[16])
+                            if views == -1:
+                                views = 0
                             title = row[14]
                             text = title + " " + row[1]
                             tokens = TextNormalizer.prepare_text(text, "en")
@@ -191,8 +196,7 @@ class DocParser:
 
         print("Calculated stopwords :", stopwords)
         print("Token counts :", tokens_count)
-        #self.print_all_tokens("en")
-
+        # self.print_all_tokens("en")
 
     def remove_stopwords(self, lang):
         stopwords_path = f"{self.stopword_dir}/stopwords_{lang}.o"

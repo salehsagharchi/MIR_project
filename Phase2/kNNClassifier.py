@@ -4,7 +4,7 @@ from math import sqrt
 
 from Phase2.DataModels import Document, kNNData
 from Phase2 import Constants
-from Tester import Tester
+from Phase2.Tester import Tester
 
 
 class kNNClassifier:
