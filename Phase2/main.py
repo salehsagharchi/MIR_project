@@ -55,19 +55,25 @@ class Main:
 
     def naive_bayes_test(self):
         NaiveBayesClassifier.start()
-        test_files = input("test on test data or train data? (default is test data)")
+        test_files = input("test with test data or train data? (default is test data)")
         if test_files == '' or test_files != 'train':
             test_files = 'test'
-        print(f"Naive Bayes Classification test on {test_files} data:")
+        print(f"Naive Bayes Classification test with {test_files} data:")
         print(NaiveBayesClassifier.test(test_files))
 
     def kNN_test(self):
-        k = int(input("please enter parameter k: "))
-        kNNClassifier.start(k)
-        test_files = input("test on test data or train data? (default is test data)")
-        if test_files == '' or test_files != 'train':
-            test_files = 'test'
-        print(f"kNN Classification test on {test_files} data:")
+        best_accuracy, best_k = 0, -1
+        kNNClassifier.start()
+        for k in Constants.kNN_parameter_list:
+            result = kNNClassifier.validation(k)
+            print(f"validating with 10% of train data with k={k}")
+            print(result)
+            print()
+            if result[Constants.ACCURACY] > best_accuracy:
+                best_accuracy = result[Constants.ACCURACY]
+                best_k = k
+        print(f"best parameter k for this train data is {best_k} with accuracy {best_accuracy}")
+        print(f"kNN classification testing with k={best_k}")
         print(kNNClassifier.test())
 
     def create_vector_model(self):

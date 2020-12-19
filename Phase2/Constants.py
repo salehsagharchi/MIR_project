@@ -11,4 +11,4 @@ naive_bayes = 0
 kNN = 1
 SVM = 2
 random_forest = 3
-
+kNN_parameter_list = [1, 5, 9]

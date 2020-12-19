@@ -4,7 +4,7 @@ from math import sqrt, log
 
 from Phase2.DataModels import Document, kNNData
 from Phase2 import Constants
-from Phase2.Utils import test_classifier
+from Phase2.Utils import test_classifier, get_test_result
 
 
 class kNNClassifier:
@@ -47,8 +47,11 @@ class kNNClassifier:
 
     @classmethod
     def multiply_vector_by_idf(cls, data: kNNData):
+        if data.is_multiplied_by_idf:
+            return
         for term in data.vector:
             data.vector[term] *= cls.get_idf(term)
+        data.is_multiplied_by_idf = True
 
     @classmethod
     def distance(cls, vector1: dict, vector2: dict):
@@ -59,9 +62,11 @@ class kNNClassifier:
         return sqrt(d)
 
     @classmethod
-    def get_k_nearest_neighbours(cls, target: kNNData):
+    def get_k_nearest_neighbours(cls, target: kNNData, validation=False):
         neighbours = []
-        [neighbours.append((data, cls.distance(data.vector, target.vector))) for data in cls.train_data]
+        start = int(validation) * (len(cls.train_data) // 10)
+        for data in cls.train_data[start:]:
+            neighbours.append((data, cls.distance(data.vector, target.vector)))
         neighbours.sort(key=lambda x: x[1])
 
         if cls.k >= len(neighbours):
@@ -69,19 +74,25 @@ class kNNClassifier:
         return [n[0] for n in neighbours[:cls.k]]
 
     @classmethod
-    def classify(cls, target: kNNData):
+    def classify(cls, target: kNNData, validation=False):
         cls.multiply_vector_by_idf(target)
-        nearest_neighbours = cls.get_k_nearest_neighbours(target)
+        nearest_neighbours = cls.get_k_nearest_neighbours(target, validation)
         labels_count = [0 for _ in range(len(Constants.label_index))]
         for neighbour in nearest_neighbours:
             labels_count[neighbour.label] += 1
         return labels_count.index(max(labels_count))
 
     @classmethod
+    def validation(cls, k):
+        cls.k = k
+        predictions = []
+        validation_size = len(cls.train_data) // 10
+        for i in range(validation_size):
+            predictions.append(cls.classify(cls.train_data[i], validation=True))
+
+        labels = [data.label for data in cls.train_data[:validation_size]]
+        return get_test_result(labels, predictions)
+
+    @classmethod
     def test(cls, test_files='test'):
         return test_classifier(Constants.kNN, cls.classify, test_files)
-
-
-if __name__ == '__main__':
-    kNNClassifier.start(5)
-    print(kNNClassifier.test())
