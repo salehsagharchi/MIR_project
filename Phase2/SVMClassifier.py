@@ -11,6 +11,7 @@ from Phase2.Tester import TestingType
 from Phase2 import Constants
 from Phase2.DataModels import Document
 from Phase2.VectorSpaceModel import VectorSpaceCreator
+from Utils import get_test_result
 
 
 class SVMClassifier:
@@ -26,10 +27,6 @@ class SVMClassifier:
         self.clf.fit(self.X_train, self.Y_train)
 
     def test(self, testing_type: TestingType, clf):
-        true_positive, true_negative, false_positive, false_negative = 0, 0, 0, 0
-
-        source = []
-        predicted = []
         if testing_type == TestingType.TRAIN:
             predicted = clf.predict(self.X_train)
             source = self.Y_train
@@ -40,25 +37,7 @@ class SVMClassifier:
             predicted = clf.predict(self.X_valid)
             source = self.Y_valid
 
-        for i in range(len(source)):
-            if source[i] == "1":
-                if predicted[i] == "1":
-                    true_positive += 1
-                else:
-                    false_negative += 1
-            else:
-                if predicted[i] == "1":
-                    false_positive += 1
-                else:
-                    true_negative += 1
-
-        result = {}
-        result[Constants.PRECISION] = round(true_positive / (true_positive + false_positive), 6)
-        result[Constants.RECALL] = round(true_positive / (true_positive + false_negative), 6)
-        result[Constants.ACCURACY] = round((true_positive + true_negative) / (true_positive + true_negative + false_positive + false_negative), 6)
-        result[Constants.F1] = round(
-            (2 * result[Constants.PRECISION] * result[Constants.RECALL]) / (result[Constants.PRECISION] + result[Constants.RECALL]), 6)
-        return result
+        return get_test_result(list(map(int, source)), list(map(int, predicted)))
 
     def batch_fiting(self, Cs):
         max_acc = -1

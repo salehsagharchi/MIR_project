@@ -12,6 +12,7 @@ class kNNData:
     def __init__(self, tokens: list, label):
         self.label = label
         self.vector = dict()
+        self.is_multiplied_by_idf = False
         for term in tokens:
             if self.vector.get(term) is None:
                 self.vector[term] = 1
