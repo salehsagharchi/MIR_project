@@ -26,7 +26,7 @@ def prompt_from_list(options: list, prompt_msg="Please Select One Option"):
         type=click.IntRange(1, n),
         prompt_suffix="",
     )
-    print("\n")
+    print("")
     return choice - 1
 
 
@@ -38,7 +38,7 @@ class Main:
         self.tedtalks_raw_train = tedtalks_raw_train
         self.tedtalks_raw_test = tedtalks_raw_test
         self.parser: Parser.DocParser = Parser.DocParser(stopword_dir, docs_dir, tedtalks_raw_train, tedtalks_raw_test)
-        self.vector_space_model = None
+        self.vector_space_model: VectorSpaceCreator = None
 
     # def initialize_classes(self):
     #     print("Loading files ...")
@@ -111,6 +111,7 @@ class Main:
         result2 = rf.test(TestingType.TEST)
         print(f'result for testing with TRAIN Data : {result}')
         print(f'result for testing with TEST Data : {result2}')
+        rf.write_model_to_file()
 
     def start(self):
         welcome_text = "Welcome to this application !"

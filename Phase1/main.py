@@ -1,5 +1,7 @@
 import os
 import pickle
+from time import sleep
+
 import click
 from Phase1 import Parser
 from Phase1.Parser import TextNormalizer as Normalizer, TextNormalizer
@@ -9,7 +11,8 @@ from Phase1.Indexer import Indexer
 from Phase1.Score import Score
 from Phase1.Preferences import Preferences
 from Phase1.DataModels import Document
-
+from Phase2.VectorSpaceModel import VectorSpaceCreator
+import Phase2.Constants as PH2Cons
 
 
 def prompt_from_list(options: list, prompt_msg="Please Select One Option"):
@@ -36,6 +39,9 @@ class Main:
         self.tedtalks_raw = tedtalks_raw
         self.wiki_raw = wiki_raw
         self.parser: Parser.DocParser = Parser.DocParser(stopword_dir, docs_dir, tedtalks_raw, wiki_raw)
+        self.vector_space_model: VectorSpaceCreator = None
+        self.clf_model = None
+        self.all_documents: dict = dict()
 
     def initialize_classes(self):
         print("Loading files ...")
@@ -132,7 +138,37 @@ class Main:
         print("Normalized query :", normalized_query[1])
         result = score.query(queryTokens)
         if result is not None:
-            print(result[0:min(10, len(result))])
+           print(result[0:min(10, len(result))])
+
+    def query_phase2(self):
+        if self.load_dependencies() is None:
+            return None
+        queryStatement = input("Pls enter your query: ")
+        queryView = input("Pls enter your view: ")
+        labelView = queryView
+        if labelView != "1" and labelView != "-1":
+            print("Please Enter valid view !")
+            return None
+        if labelView == "-1":
+            labelView = "0"
+        score = Score()
+        normalized_query = self.parser.prepare_query(queryStatement)
+        queryTokens = normalized_query[0]
+        print("Normalized query :", normalized_query[1])
+        results = score.query(queryTokens)
+        if results is None:
+            return None
+        classified_results = []
+        for item in results:
+            if str(item[0]) in self.all_documents:
+                tokens = self.all_documents[str(item[0])].tokens
+                vector = self.vector_space_model.create_td_idf_for_tokens(tokens)
+                label = self.clf_model.predict([vector])[0]
+                if str(label) == labelView:
+                    classified_results.append(item)
+        print(f"Found {len(results)} results and {len(classified_results)} with view = {queryView} : ")
+        print(classified_results)
+
 
     def printdoc(self):
         docid = input("Enter a document id : ")
@@ -159,6 +195,32 @@ class Main:
         Bigram.save_bigram()
         print("files were saved successfully!")
 
+    def load_dependencies(self):
+        if not self.all_documents:
+            print("Loading documents ...")
+            for filename in os.listdir(Constants.docs_dir):
+                if filename.endswith('_en.o'):
+                    file_path = os.path.join(Constants.docs_dir, filename)
+                    with open(file_path, 'rb') as f:
+                        doc: Document = pickle.load(f)
+                        doc.tokens = doc.normalized_title.split(" ") + doc.tokens
+                        self.all_documents[filename.split("_")[0].strip()] = doc
+            if not self.all_documents:
+                return None
+        if self.vector_space_model is None:
+            print("Loading vector space model of phase2 docs ...")
+            self.vector_space_model = VectorSpaceCreator.readModel(True)
+            if self.vector_space_model is None:
+                return None
+        if self.clf_model is None:
+            print("Loading RF trained model ...")
+            if not os.path.isfile("../Phase2/" + PH2Cons.rf_clf_model):
+                print("Cannot find RF trained model. Try to make that.")
+                return None
+            with open("../Phase2/" + PH2Cons.rf_clf_model, "rb") as file:
+                self.clf_model = pickle.load(file)
+        return True
+
     def start(self):
         welcome_text = "با سلام به این برنامه خوش آمدید"
         print(Normalizer.reshape_text(welcome_text, "fa"))
@@ -175,11 +237,13 @@ class Main:
             "Jaccard similarity for 2 terms": self.jaccard,
             "Edit distance for 2 terms": self.edit_distance,
             "Search through documents": self.query,
+            "Phase2::Search through documents with view (Only Ted Docs)": self.query_phase2,
             "Save everything": self.save,
             "EXIT": -1
         }
         finish = False
         while not finish:
+            sleep(0.5)
             job = prompt_from_list(list(main_jobs), "Please select a job you want to execute : ")
             command = list(main_jobs.values())[job]
             finish = command == -1

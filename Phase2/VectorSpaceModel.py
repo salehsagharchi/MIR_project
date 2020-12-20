@@ -19,6 +19,7 @@ class VectorSpaceCreator:
         self.idfs: list = []
 
     def load_documents(self):
+        print("Loading documents ...")
         for filename in os.listdir(Constants.docs_dir):
             if filename.endswith('.o'):
                 file_path = os.path.join(Constants.docs_dir, filename)
@@ -103,11 +104,14 @@ class VectorSpaceCreator:
         return np.array(tfidf_values)
 
     @staticmethod
-    def readModel():
-        if not os.path.isfile(f'{Constants.data_dir_root}/VectorSpaceModel.o'):
+    def readModel(fromphase1=False):
+        path = f'{Constants.data_dir_root}/VectorSpaceModel.o'
+        if fromphase1:
+            path = "../Phase2/" + path
+        if not os.path.isfile(path):
             print("Model file not found, try to make that.")
             return None
-        with open(f'{Constants.data_dir_root}/VectorSpaceModel.o', "rb") as file:
+        with open(path, "rb") as file:
             modelobject: VectorSpaceCreator = pickle.load(file)
         return modelobject
 

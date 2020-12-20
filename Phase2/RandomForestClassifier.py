@@ -1,5 +1,8 @@
+import pickle
+
 from sklearn.ensemble import RandomForestClassifier
 
+from Phase2 import Constants
 from Phase2.Tester import TestingType
 from Phase2.VectorSpaceModel import VectorSpaceCreator
 from Phase2.Utils import get_test_result
@@ -26,3 +29,7 @@ class RFClassifier:
             return None
 
         return get_test_result(list(map(int, source)), list(map(int, predicted)))
+
+    def write_model_to_file(self):
+        with open(Constants.rf_clf_model, "wb") as file:
+            pickle.dump(self.clf, file)

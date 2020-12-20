@@ -29,6 +29,7 @@ class TextNormalizer:
     stemmer = hazm.Stemmer()
 
     regex_en_space = re.compile('[%s]' % re.escape(string.punctuation))
+    regex_en_unwanted = re.compile(r'[^A-Za-z0-9\s]+')
     porter_stemmer = nltk.stem.PorterStemmer()
 
     @staticmethod
@@ -55,6 +56,7 @@ class TextNormalizer:
     def prepare_english_text(text, tokenize):
         t = text.casefold()
         t = TextNormalizer.regex_en_space.sub(' ', t)
+        t = TextNormalizer.regex_en_unwanted.sub(' ', t)
         tokens = nltk.tokenize.word_tokenize(t)
         stemmed_tokens = []
         for x in tokens:

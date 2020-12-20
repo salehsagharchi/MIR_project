@@ -55,6 +55,7 @@ class SVMClassifier:
                 best_c = c
                 best_clf = copy.deepcopy(self.clf)
 
+        self.clf = copy.deepcopy(best_clf)
         print(f"\nMax Accuracy = {max_acc} for C = {best_c}")
         print(f"\nStart Test Model for All Data with C = {best_c} ...")
         result = self.test(TestingType.TRAIN, best_clf)
