@@ -8,7 +8,7 @@ class Word2vec:
         self.textArray = []
         self.gensimList = []
         self.vectors = []
-        self.DIM = 50
+        self.DIM = 1000
 
     def initialGensimListFromArray(self, sentences):
         self.textArray = sentences
@@ -20,7 +20,7 @@ class Word2vec:
             self.gensimList.append(current)
 
     def createWordVectors(self):
-        self.vectors = Word2Vec(self.gensimList, min_count=1, size=self.DIM, workers=3, window=3, sg=1)
+        self.vectors = Word2Vec(self.gensimList, min_count=20, size=self.DIM, workers=3, window=3, sg=1)
 
     def createSentenceVector(self, sentence):
         vec = [0 for i in range(self.DIM)]
