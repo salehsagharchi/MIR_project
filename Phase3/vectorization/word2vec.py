@@ -8,17 +8,25 @@ class Word2vec:
         self.textArray = []
         self.gensimList = []
         self.vectors = []
+        self.DIM = 50
 
-    def initialTextArrayFromFile(self, path):
-        arr = json.loads(open(path, "r", encoding="utf-8").read())
-        for element in arr:
-            textFroAnalyse = element['summary']
-            current = Phase3.Parser.TextNormalizer.prepare_text(textFroAnalyse, "fa")
-            current.append(element["link"])
+    def initialGensimListFromArray(self, sentences):
+        self.textArray = sentences
+        self.initialGensimList()
+
+    def initialGensimList(self):
+        for element in self.textArray:
+            current = Phase3.Parser.TextNormalizer.prepare_text(element, "fa")
             self.gensimList.append(current)
 
-    def addText(self, newTexts):
-        self.textArray += newTexts
+    def createWordVectors(self):
+        self.vectors = Word2Vec(self.gensimList, min_count=1, size=self.DIM, workers=3, window=3, sg=1)
 
-    def createVectors(self):
-        self.vectors = Word2Vec(self.gensimList, min_count=1, size=50, workers=3, window=3, sg=1)
+    def createSentenceVector(self, sentence):
+        vec = [0 for i in range(self.DIM)]
+        counter = 0
+        for word in sentence:
+            if word in self.vectors.wv.vocab:
+                vec += self.vectors.wv[word]
+                counter += 1
+        return [x / counter for x in vec]
