@@ -1,17 +1,15 @@
 import os
-import pickle
+
 import click
 
+from Phase2 import Constants
+from Phase2 import Parser
 from Phase2.NaiveBayesClassifier import NaiveBayesClassifier
+from Phase2.RandomForestClassifier import RFClassifier
+from Phase2.SVMClassifier import SVMClassifier
+from Phase2.Tester import TestingType
 from Phase2.VectorSpaceModel import VectorSpaceCreator
 from Phase2.kNNClassifier import kNNClassifier
-from Phase2 import Parser
-from Phase2.Parser import TextNormalizer as Normalizer, TextNormalizer
-from Phase2 import Constants
-from Phase2.DataModels import Document
-from Phase2.SVMClassifier import SVMClassifier
-from Phase2.RandomForestClassifier import RFClassifier
-from Phase2.Tester import TestingType
 
 
 def prompt_from_list(options: list, prompt_msg="Please Select One Option"):
@@ -26,7 +24,7 @@ def prompt_from_list(options: list, prompt_msg="Please Select One Option"):
         type=click.IntRange(1, n),
         prompt_suffix="",
     )
-    print("")
+    print("\n")
     return choice - 1
 
 
@@ -38,16 +36,7 @@ class Main:
         self.tedtalks_raw_train = tedtalks_raw_train
         self.tedtalks_raw_test = tedtalks_raw_test
         self.parser: Parser.DocParser = Parser.DocParser(stopword_dir, docs_dir, tedtalks_raw_train, tedtalks_raw_test)
-        self.vector_space_model: VectorSpaceCreator = None
-
-    # def initialize_classes(self):
-    #     print("Loading files ...")
-    #     try:
-    #         Preferences.load_pref()
-    #         Indexer.load_index()
-    #         Bigram.load_file()
-    #     except AttributeError:
-    #         pass
+        self.vector_space_model = None
 
     def parsing_files(self):
         self.parser.parse_tedtalks()
@@ -100,7 +89,7 @@ class Main:
         svm = SVMClassifier(self.vector_space_model)
         svm.batch_fiting(clist)
 
-    def RFTest(self):
+    def random_forest_test(self):
         if self.vector_space_model is None:
             print("Vector space model is not ready, attempting to create or load it ...")
             if not self.create_vector_model():
@@ -109,9 +98,10 @@ class Main:
         rf.fit()
         result = rf.test(TestingType.TRAIN)
         result2 = rf.test(TestingType.TEST)
-        print(f'result for testing with TRAIN Data : {result}')
-        print(f'result for testing with TEST Data : {result2}')
-        rf.write_model_to_file()
+        print("Random Forest Classification result for testing with TRAIN Data:")
+        print(result)
+        print("Random Forest Classification result for testing with TEST Data:")
+        print(result2)
 
     def start(self):
         welcome_text = "Welcome to this application !"
@@ -123,7 +113,7 @@ class Main:
             "Naive Bayes test": self.naive_bayes_test,
             "kNN test": self.kNN_test,
             "SVM Classification": self.svm_test,
-            "Random Forest Classification": self.RFTest,
+            "Random Forest Classification": self.random_forest_test,
             "EXIT": -1
         }
         finish = False
