@@ -132,9 +132,3 @@ class Crawler:
     @staticmethod
     def convert_dict_to_paper(dict):
         return Paper(dict['id'], dict['title'], dict['abstract'], dict['date'], dict['authors'], dict['references'])
-
-
-c = Crawler(Constants.crawler_start_file, 5000, Constants.crawler_data_dir_root, "")
-c.start_crawling()
-c.close_crawler()
-print("OK")
