@@ -16,9 +16,9 @@ class TFIDF:
     @classmethod
     def start(cls):
         cls.document_frequency.clear()
-        cls.document_vector_list.clear()
+        cls.document_vector_list = list()
         cls.vocab.clear()
-        cls.link_list.clear()
+        cls.link_list = list()
         documents = json.loads(open(FARSI_DOCUMENTS_PATH, 'r', encoding="utf-8").read())
         cls.total_docs = len(documents)
         cls.get_reference_labels(documents)
@@ -37,10 +37,13 @@ class TFIDF:
         cls.create_document_vectors(document_dicts)
 
     @classmethod
-    def get_reference_labels(cls, documents):
+    def get_reference_labels(cls, documents, primary_mode=True):
         cls.reference_label_list.clear()
         for doc in documents:
-            tag = doc['tags'][0].split('>')[1][1:]
+            if primary_mode:
+                tag = doc['tags'][0].split('>')[0][:-1]
+            else:
+                tag = doc['tags'][0].split('>')[1][1:]
             cls.reference_label_list.append(tag)
 
     @classmethod
@@ -87,20 +90,12 @@ class TFIDF:
         for term in vector:
             vector[term] /= s
 
-    @classmethod
-    def distance(cls, vector1: dict, vector2: dict):
-        d = 0
-        for term in vector1:
-            if vector2.get(term) is None:
-                d += vector1[term] ** 2
-            else:
-                d += (vector1[term] - vector2[term]) ** 2
-        for term in vector2:
-            if vector1.get(term) is None:
-                d += vector2[term] ** 2
-
-        return sqrt(d)
-
-
-if __name__ == '__main__':
-    pass
+# if __name__ == '__main__':
+#     TFIDF.start()
+#     print("A", len(TFIDF.document_vector_list))
+#     print("B", len(TFIDF.document_vector_list[0]))
+#     new_vectors = SelectKBest(chi2, k=400).fit_transform(TFIDF.document_vector_list, TFIDF.reference_label_list)
+#     print("C", len(TFIDF.document_vector_list))
+#     print("D", len(TFIDF.document_vector_list[0]))
+#     print("E", len(new_vectors))
+#     print("F", len(new_vectors[0]))
