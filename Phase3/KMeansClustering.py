@@ -126,14 +126,15 @@ class KMeansClustering:
 
 if __name__ == '__main__':
     # change this
-    # mode = WORD2VEC_MODE
-    #
-    # KMeansClustering.start(vectorization_mode=mode)
+    mode = WORD2VEC_MODE
+
+    KMeansClustering.start(vectorization_mode=mode)
+    vectors = KMeansClustering.select_k_best_features(100)
     # vectors = None
     # if mode == TFIDF_MODE:
     #     vectors = KMeansClustering.select_k_best_features(3500)
-    # KMeansClustering.cluster(vectors=vectors, vectorization_mode=mode)
-    # vs = len(KMeansClustering.vector_list[0])
-    # print(vs, KMeansClustering.evaluate())
+    KMeansClustering.cluster(vectors=vectors, vectorization_mode=mode)
+    vs = len(KMeansClustering.vector_list[0])
+    print(vs, KMeansClustering.evaluate())
 
-    KMeansClustering.get_graphical_results(WORD2VEC_MODE)
+    # KMeansClustering.get_graphical_results(WORD2VEC_MODE)
