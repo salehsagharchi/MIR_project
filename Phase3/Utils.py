@@ -14,16 +14,17 @@ def write_to_file(path, link_list: list, label_list: list, reference_label_list:
             csv_writer.writerow([link_list[i], str(label_list[i]), reference_label_list[i]])
 
 
-def evaluate_clustering(n_clusters, label_list: list, reference_label_list: list):
+def evaluate_clustering(label_list: list, reference_label_list: list):
     evaluation = dict()
-    evaluation['purity'] = round(calculate_purity(n_clusters, label_list, reference_label_list), 6)
+    evaluation['purity'] = round(calculate_purity(label_list, reference_label_list), 6)
     evaluation['ARI'] = round(adjusted_rand_score(reference_label_list, label_list), 6)
     evaluation['NMI'] = round(normalized_mutual_info_score(reference_label_list, label_list), 6)
     evaluation['AMI'] = round(adjusted_mutual_info_score(reference_label_list, label_list), 6)
     return evaluation
 
 
-def calculate_purity(n_clusters, label_list: list, reference_label_list: list):
+def calculate_purity(label_list: list, reference_label_list: list):
+    n_clusters = len(set(label_list))
     reference_labels_for_each_cluster = [[] for _ in range(n_clusters)]
     for i, label in enumerate(label_list):
         reference_labels_for_each_cluster[label].append(reference_label_list[i])

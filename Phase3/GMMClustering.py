@@ -41,7 +41,7 @@ class GMMClustering:
 
     @classmethod
     def get_n_components(cls):
-        return int(sqrt(len(cls.link_list))) + 1
+        return int(sqrt(len(cls.link_list)) * 0.72) + 1
 
     @classmethod
     def write_results_to_file(cls, mode):
@@ -74,7 +74,7 @@ class GMMClustering:
 
     @classmethod
     def evaluate(cls):
-        return evaluate_clustering(cls.get_n_components(), cls.label_list, cls.reference_label_list)
+        return evaluate_clustering(cls.label_list, cls.reference_label_list)
 
     @classmethod
     def get_graphical_results(cls, vectorization_mode=TFIDF_MODE):
@@ -89,7 +89,7 @@ class GMMClustering:
         while k < 680:
             new_vectors = cls.select_k_best_features(k)
             cls.cluster(vectors=new_vectors, vectorization_mode=vectorization_mode)
-            evaluation = evaluate_clustering(cls.get_n_components(), cls.label_list, cls.reference_label_list)
+            evaluation = evaluate_clustering(cls.label_list, cls.reference_label_list)
             k_list.append(k)
             purity_list.append(evaluation['purity'])
             ARI_list.append(evaluation['ARI'])
@@ -108,7 +108,7 @@ class GMMClustering:
         plt.text(cls.get_n_components(), 0.9, f'number of clusters = {cls.get_n_components()}')
         plt.title('changes w.r.t. number of features selected')
         if vectorization_mode == TFIDF_MODE:
-            plt.savefig('data/gmm_tfidf_plot_3.png')
+            plt.savefig('data/gmm_tfidf_plot_4.png')
         elif vectorization_mode == WORD2VEC_MODE:
             plt.savefig('data/gmm_word2vec_plot_3.png')
         plt.close()
@@ -118,7 +118,9 @@ if __name__ == '__main__':
     # change this
     mode = Word2vec
 
-    GMMClustering.start(TFIDF_MODE)
+    GMMClustering.start(mode)
     vectors = GMMClustering.select_k_best_features(150)
-    GMMClustering.cluster(vectors=vectors, vectorization_mode=TFIDF_MODE)
+    GMMClustering.cluster(vectors=vectors, vectorization_mode=mode)
     print(GMMClustering.evaluate())
+
+    # GMMClustering.get_graphical_results(TFIDF_MODE)

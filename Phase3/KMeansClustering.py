@@ -25,7 +25,7 @@ class KMeansClustering:
             cls.vector_list = TFIDF.document_vector_list
             cls.reference_label_list = TFIDF.reference_label_list
         elif vectorization_mode == WORD2VEC_MODE:
-            w2v = Word2vec(4, 2000, 3, 3, 1)
+            w2v = Word2vec(2, 2000, 3, 3, 1)
             cls.vector_list, cls.link_list, cls.reference_label_list = w2v.createVectorsOfSentenceByPath(FARSI_DOCUMENTS_PATH)
 
     @classmethod
@@ -75,7 +75,7 @@ class KMeansClustering:
 
     @classmethod
     def evaluate(cls):
-        return evaluate_clustering(cls.get_k(), cls.label_list, cls.reference_label_list)
+        return evaluate_clustering(cls.label_list, cls.reference_label_list)
 
     @classmethod
     def get_graphical_results(cls, vectorization_mode=TFIDF_MODE):
@@ -87,7 +87,7 @@ class KMeansClustering:
         AMI_list = []
 
         cls.cluster(vectorization_mode=vectorization_mode)
-        evaluation = evaluate_clustering(cls.get_k(), cls.label_list, cls.reference_label_list)
+        evaluation = evaluate_clustering(cls.label_list, cls.reference_label_list)
         k = len(cls.vector_list[0])
         k_list.append(k)
         purity_list.append(evaluation['purity'])
@@ -99,24 +99,26 @@ class KMeansClustering:
         while k > cls.get_k():
             new_vectors = cls.select_k_best_features(k)
             cls.cluster(vectors=new_vectors, vectorization_mode=vectorization_mode)
-            evaluation = evaluate_clustering(cls.get_k(), cls.label_list, cls.reference_label_list)
+            evaluation = evaluate_clustering(cls.label_list, cls.reference_label_list)
             k_list.append(k)
             purity_list.append(evaluation['purity'])
             ARI_list.append(evaluation['ARI'])
             NMI_list.append(evaluation['NMI'])
             AMI_list.append(evaluation['AMI'])
+            print(k, evaluation)
             k = int(k / 1.2)
 
         plt.plot(k_list, purity_list, label='purity')
-        plt.plot(k_list, ARI_list, label='ARI')
-        plt.plot(k_list, NMI_list, label='NMI')
+        plt.plot(k_list, ARI_list, label='ARI (adjusted rand index)')
+        plt.plot(k_list, NMI_list, label='NMI (normalized mutual info)')
+        plt.plot(k_list, AMI_list, label='AMI (adjusted mutual info)')
         plt.ylim(0, 1)
         plt.xlabel('vector size')
         plt.legend()
         plt.text(k, 0.9, f'number of clusters = {cls.get_k()}')
         plt.title('changes w.r.t. number of features selected')
         if vectorization_mode == TFIDF_MODE:
-            plt.savefig('data/kmeans_tfidf_plot_3.png')
+            plt.savefig('data/kmeans_tfidf_plot_4.png')
         elif vectorization_mode == WORD2VEC_MODE:
             plt.savefig('data/kmeans_word2vec_plot_3.png')
         plt.close()
@@ -124,11 +126,14 @@ class KMeansClustering:
 
 if __name__ == '__main__':
     # change this
-    mode = WORD2VEC_MODE
+    # mode = WORD2VEC_MODE
+    #
+    # KMeansClustering.start(vectorization_mode=mode)
+    # vectors = None
+    # if mode == TFIDF_MODE:
+    #     vectors = KMeansClustering.select_k_best_features(3500)
+    # KMeansClustering.cluster(vectors=vectors, vectorization_mode=mode)
+    # vs = len(KMeansClustering.vector_list[0])
+    # print(vs, KMeansClustering.evaluate())
 
-    KMeansClustering.start(vectorization_mode=mode)
-    vectors = None
-    if mode == TFIDF_MODE:
-        vectors = KMeansClustering.select_k_best_features(3500)
-    KMeansClustering.cluster(vectors=vectors, vectorization_mode=mode)
-    print(KMeansClustering.evaluate())
+    KMeansClustering.get_graphical_results(WORD2VEC_MODE)
