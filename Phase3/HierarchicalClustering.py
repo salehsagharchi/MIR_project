@@ -25,7 +25,7 @@ class HierarchicalClustering:
             cls.vector_list = TFIDF.document_vector_list
             cls.reference_label_list = TFIDF.reference_label_list
         elif vectorization_mode == WORD2VEC_MODE:
-            w2v = Word2vec(2, 2000, 3, 3, 1)
+            w2v = Word2vec(3, 100, 3, 3, 1)
             cls.vector_list, cls.link_list, cls.reference_label_list = w2v.createVectorsOfSentenceByPath(FARSI_DOCUMENTS_PATH)
 
     @classmethod
@@ -126,13 +126,13 @@ class HierarchicalClustering:
 
 if __name__ == '__main__':
     # change this
-    mode = TFIDF_MODE
+    mode = WORD2VEC_MODE
 
-    # HierarchicalClustering.start(vectorization_mode=mode)
-    # vectors = None
-    # if mode == TFIDF_MODE:
-    #     vectors = HierarchicalClustering.select_k_best_features(200)
-    # HierarchicalClustering.cluster(vectors=vectors, vectorization_mode=mode)
-    # print(HierarchicalClustering.evaluate())
+    HierarchicalClustering.start(vectorization_mode=mode)
+    vectors = None
+    if mode == TFIDF_MODE:
+        vectors = HierarchicalClustering.select_k_best_features(200)
+    HierarchicalClustering.cluster(vectors=vectors, vectorization_mode=mode)
+    print(HierarchicalClustering.evaluate())
 
-    HierarchicalClustering.get_graphical_results(vectorization_mode=mode)
+    # HierarchicalClustering.get_graphical_results(vectorization_mode=mode)

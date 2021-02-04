@@ -25,7 +25,7 @@ class GMMClustering:
             cls.vector_list = TFIDF.document_vector_list
             cls.reference_label_list = TFIDF.reference_label_list
         elif vectorization_mode == WORD2VEC_MODE:
-            w2v = Word2vec(5, 150, 3, 3, 1)
+            w2v = Word2vec(5, 75, 3, 3, 1)
             cls.vector_list, cls.link_list, cls.reference_label_list = w2v.createVectorsOfSentenceByPath(
                 FARSI_DOCUMENTS_PATH)
 
@@ -118,10 +118,12 @@ class GMMClustering:
 
 if __name__ == '__main__':
     # change this
-    mode = Word2vec
+    mode = WORD2VEC_MODE
 
     GMMClustering.start(mode)
-    vectors = GMMClustering.select_k_best_features(150)
+    vectors = None
+    if mode == TFIDF_MODE:
+        vectors = GMMClustering.select_k_best_features(150)
     GMMClustering.cluster(vectors=vectors, vectorization_mode=mode)
     print(GMMClustering.evaluate())
 

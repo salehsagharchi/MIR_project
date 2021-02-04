@@ -25,7 +25,7 @@ class KMeansClustering:
             cls.vector_list = TFIDF.document_vector_list
             cls.reference_label_list = TFIDF.reference_label_list
         elif vectorization_mode == WORD2VEC_MODE:
-            w2v = Word2vec(2, 2000, 3, 3, 1)
+            w2v = Word2vec(4, 200, 3, 3, 1)
             cls.vector_list, cls.link_list, cls.reference_label_list = w2v.createVectorsOfSentenceByPath(FARSI_DOCUMENTS_PATH)
 
     @classmethod
@@ -127,14 +127,16 @@ class KMeansClustering:
 if __name__ == '__main__':
     # change this
     mode = WORD2VEC_MODE
-
+    print("1")
     KMeansClustering.start(vectorization_mode=mode)
-    vectors = KMeansClustering.select_k_best_features(100)
-    # vectors = None
-    # if mode == TFIDF_MODE:
-    #     vectors = KMeansClustering.select_k_best_features(3500)
+    print("2")
+    vectors = None
+    if mode == TFIDF_MODE:
+        vectors = KMeansClustering.select_k_best_features(3500)
+    print("3")
     KMeansClustering.cluster(vectors=vectors, vectorization_mode=mode)
     vs = len(KMeansClustering.vector_list[0])
+    print("4")
     print(vs, KMeansClustering.evaluate())
-
+    print("5")
     # KMeansClustering.get_graphical_results(WORD2VEC_MODE)
