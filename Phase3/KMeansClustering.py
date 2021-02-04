@@ -36,6 +36,7 @@ class KMeansClustering:
     def cluster(cls, vectors=None, vectorization_mode=TFIDF_MODE):
         if vectors is None:
             vectors = cls.vector_list
+        print(cls.get_k())
         kmeans = KMeans(n_clusters=cls.get_k(), random_state=0).fit(vectors)
         cls.label_list = kmeans.labels_
         cls.write_results_to_file(vectorization_mode)

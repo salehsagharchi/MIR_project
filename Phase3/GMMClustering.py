@@ -25,15 +25,17 @@ class GMMClustering:
             cls.vector_list = TFIDF.document_vector_list
             cls.reference_label_list = TFIDF.reference_label_list
         elif vectorization_mode == WORD2VEC_MODE:
-            w2v = Word2vec(4, 4000, 3, 3, 1)
+            w2v = Word2vec(5, 150, 3, 3, 1)
             cls.vector_list, cls.link_list, cls.reference_label_list = w2v.createVectorsOfSentenceByPath(
                 FARSI_DOCUMENTS_PATH)
 
     @classmethod
     def cluster(cls, vectors, vectorization_mode=TFIDF_MODE):
+        if vectors is None:
+            vectors = cls.vector_list
         gmm = GaussianMixture(n_components=cls.get_n_components(), random_state=0)
         cls.label_list = gmm.fit_predict(vectors)
-        # cls.write_results_to_file(vectorization_mode)
+        cls.write_results_to_file(vectorization_mode)
 
     @classmethod
     def select_k_best_features(cls, k):
@@ -116,9 +118,10 @@ class GMMClustering:
 
 if __name__ == '__main__':
     # change this
-    mode = TFIDF_MODE
+    mode = WORD2VEC_MODE
     #
     GMMClustering.start(mode)
-    vectors = GMMClustering.select_k_best_features(150)
-    GMMClustering.cluster(vectors=vectors, vectorization_mode=mode)
+    if mode == TFIDF_MODE:
+        vectors = GMMClustering.select_k_best_features(150)
+    GMMClustering.cluster(vectors=None, vectorization_mode=mode)
     print(GMMClustering.evaluate())
