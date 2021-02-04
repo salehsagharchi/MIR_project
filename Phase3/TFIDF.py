@@ -25,8 +25,7 @@ class TFIDF:
 
         document_dicts = []
         for doc in documents:
-            list_of_terms = TextNormalizer.prepare_text(doc['summary'], "fa")
-            document_dicts.append(cls.create_document_dict(list_of_terms))
+            document_dicts.append(cls.create_document_dict(cls.get_list_of_terms_from_document(doc)))
             cls.link_list.append(doc['link'])
 
         for doc_dict in document_dicts:
@@ -35,6 +34,12 @@ class TFIDF:
             cls.normalize_vector(doc_dict)
 
         cls.create_document_vectors(document_dicts)
+
+    @classmethod
+    def get_list_of_terms_from_document(cls, document):
+        list_of_terms = TextNormalizer.prepare_text(document['title'], "fa")
+        list_of_terms += TextNormalizer.prepare_text(document['summary'], "fa")
+        return list_of_terms
 
     @classmethod
     def get_reference_labels(cls, documents, primary_mode=True):
@@ -89,13 +94,3 @@ class TFIDF:
         s = sqrt(s)
         for term in vector:
             vector[term] /= s
-
-# if __name__ == '__main__':
-#     TFIDF.start()
-#     print("A", len(TFIDF.document_vector_list))
-#     print("B", len(TFIDF.document_vector_list[0]))
-#     new_vectors = SelectKBest(chi2, k=400).fit_transform(TFIDF.document_vector_list, TFIDF.reference_label_list)
-#     print("C", len(TFIDF.document_vector_list))
-#     print("D", len(TFIDF.document_vector_list[0]))
-#     print("E", len(new_vectors))
-#     print("F", len(new_vectors[0]))

@@ -8,6 +8,8 @@ class Word2vec:
         self.textArray = []
         self.gensimList = []
         self.vectors = []
+        self.links = []
+        self.references = []
         self.DIM = DIM
         self.minCount = minCount
         self.workers = workers
@@ -36,10 +38,19 @@ class Word2vec:
                 counter += 1
         return [x / counter for x in vec]
 
+    def get_reference_label(self, doc, primary_mode=True):
+        if primary_mode:
+            tag = doc['tags'][0].split('>')[0][:-1]
+        else:
+            tag = doc['tags'][0].split('>')[1][1:]
+        return tag
+
     def createVectorsOfSentenceByPath(self, path):
         sentences = json.loads(open(path, "r", encoding="utf-8").read())
         for sent in sentences:
             currentText = sent["summary"] + " " + sent["title"]
+            self.links.append(sent['link'])
+            self.references.append(self.get_reference_label(sent))
             self.textArray.append(currentText)
             parsedText = Phase3.Parser.TextNormalizer.prepare_text(currentText, "fa")
             self.gensimList.append(parsedText)
@@ -47,7 +58,7 @@ class Word2vec:
         result = []
         for sent in self.textArray:
             result.append(self.createSentenceVector(sent))
-        return result
+        return result, self.links, self.references
 
 
 w2v = Word2vec(4, 100, 3, 3, 1)
