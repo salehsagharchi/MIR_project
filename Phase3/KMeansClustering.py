@@ -66,7 +66,6 @@ class KMeansClustering:
                     cls.link_list.append(row[0])
                     cls.label_list.append(int(row[1]))
                     cls.reference_label_list.append(row[2])
-                    pass
                 line_count += 1
 
     @classmethod
@@ -123,18 +122,76 @@ class KMeansClustering:
             plt.savefig('data/kmeans_word2vec_plot_3.png')
         plt.close()
 
+    @classmethod
+    def save_graphical_results(cls, vectorization_mode=TFIDF_MODE):
+        cls.start(vectorization_mode)
+        k_list = []
+        purity_list = []
+        ARI_list = []
+        NMI_list = []
+        AMI_list = []
+
+        k = cls.get_k()
+        while k <= 500:
+            new_vectors = cls.select_k_best_features(k)
+            cls.cluster(vectors=new_vectors, vectorization_mode=vectorization_mode)
+            evaluation = evaluate_clustering(cls.label_list, cls.reference_label_list)
+            k_list.append(k)
+            purity_list.append(evaluation['purity'])
+            ARI_list.append(evaluation['ARI'])
+            NMI_list.append(evaluation['NMI'])
+            AMI_list.append(evaluation['AMI'])
+            print(k, evaluation)
+            k += 8
+
+        with open("data/kmeans_tfidf_metrics.csv", mode='w') as csv_file:
+            csv_writer = csv.writer(csv_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            csv_writer.writerow(["k", "purity", "ARI", "NMI", "AMI"])
+            for i in range(len(k_list)):
+                csv_writer.writerow([k_list[i], purity_list[i], ARI_list[i], NMI_list[i], AMI_list[i]])
+
+    @classmethod
+    def save_pic(cls):
+        k_list = []
+        purity_list = []
+        ARI_list = []
+        NMI_list = []
+        AMI_list = []
+        path = "data/kmeans_tfidf_metrics.csv"
+        with open(path, mode='r') as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+            line_count = 0
+            for row in csv_reader:
+                if line_count > 0 and (line_count % 2 == 0):
+                    k_list.append(row[0])
+                    purity_list.append(row[1])
+                    ARI_list.append(row[2])
+                    NMI_list.append(row[3])
+                    AMI_list.append(row[4])
+                line_count += 1
+
+        print(k_list)
+        print(purity_list)
+        print(ARI_list)
+        print(NMI_list)
+        print(AMI_list)
+
+        k_list = [1, 2, 3, 4, 5]
+        purity_list = [3, 5, 4, 3, 5]
+        plt.plot(k_list, purity_list, label='purity')
+        # plt.plot(k_list, ARI_list, label='ARI (adjusted rand index)')
+        # plt.plot(k_list, NMI_list, label='NMI (normalized mutual info)')
+        # plt.plot(k_list, AMI_list, label='AMI (adjusted mutual info)')
+        plt.ylim(0, 10)
+        plt.xlabel('vector size')
+        plt.legend()
+        # plt.text(k_list[0], 0.9, f'number of clusters = {cls.get_k()}')
+        plt.title('changes w.r.t. number of features selected')
+        # plt.savefig('data/kmeans_tfidf_plot_4.png')
+        plt.show()
+        plt.close()
+
 
 if __name__ == '__main__':
-    # change this
-    mode = WORD2VEC_MODE
-
-    KMeansClustering.start(vectorization_mode=mode)
-    vectors = KMeansClustering.select_k_best_features(100)
-    # vectors = None
-    # if mode == TFIDF_MODE:
-    #     vectors = KMeansClustering.select_k_best_features(3500)
-    KMeansClustering.cluster(vectors=vectors, vectorization_mode=mode)
-    vs = len(KMeansClustering.vector_list[0])
-    print(vs, KMeansClustering.evaluate())
-
-    # KMeansClustering.get_graphical_results(WORD2VEC_MODE)
+    # KMeansClustering.save_graphical_results()
+    KMeansClustering.save_pic()

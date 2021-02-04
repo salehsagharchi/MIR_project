@@ -7,6 +7,8 @@ from Phase3.Crawler import Crawler
 from Phase3.PageRank import PageRank
 from Phase3.Parser import TextNormalizer as Normalizer, TextNormalizer
 from Phase3 import Constants
+from Phase3.KMeansClustering import KMeansClustering
+from Phase3.Constants import *
 
 
 def prompt_from_list(options: list, prompt_msg="Please Select One Option"):
@@ -49,12 +51,28 @@ class Main:
         pagerank.make_graph()
         pagerank.calculate_page_rank(alpha)
 
+    def kmeans_tfidf(self):
+        vec_size = int(input("vec size"))
+        KMeansClustering.start(vectorization_mode=TFIDF_MODE)
+        vectors = KMeansClustering.select_k_best_features(vec_size)
+        KMeansClustering.cluster(vectors=vectors, vectorization_mode=TFIDF_MODE)
+        print(f"K-means Clustering by tf-idf with {KMeansClustering.get_k()} clusters and vector size {vec_size}")
+        print(KMeansClustering.evaluate())
+
+    def kmeans_w2v(self):
+        KMeansClustering.start(vectorization_mode=WORD2VEC_MODE)
+        KMeansClustering.cluster(vectorization_mode=TFIDF_MODE)
+        print(f"K-means Clustering by word2vec with {KMeansClustering.get_k()} clusters")
+        print(KMeansClustering.evaluate())
+
     def start(self):
         welcome_text = "Welcome to this application !"
         print(welcome_text)
         main_jobs = {
             "Crawl Microsoft Academic Papers": self.crawler,
             "Calculate Page Rank of Saved Papers": self.page_rank,
+            "K-means Clustering by tf-idf vectorization": self.kmeans_tfidf,
+            "K-means Clustering by word2vec vectorization": self.kmeans_w2v,
             "EXIT": -1
         }
         finish = False
