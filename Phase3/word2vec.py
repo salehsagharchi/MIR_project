@@ -34,7 +34,8 @@ class Word2vec:
         counter = 0
         for word in sentence:
             if word in self.vectors.wv.vocab:
-                vec += self.vectors.wv[word]
+                for i in range(len(vec)):
+                    vec[i] += self.vectors.wv[word][i]
                 counter += 1
         return [x / counter for x in vec]
 
