@@ -25,12 +25,12 @@ class HierarchicalClustering:
             cls.vector_list = TFIDF.document_vector_list
             cls.reference_label_list = TFIDF.reference_label_list
         elif vectorization_mode == WORD2VEC_MODE:
-            w2v = Word2vec(3, 100, 3, 3, 1)
+            w2v = Word2vec(2, 50, 3, 3, 1)
             cls.vector_list, cls.link_list, cls.reference_label_list = w2v.createVectorsOfSentenceByPath(FARSI_DOCUMENTS_PATH)
 
     @classmethod
     def get_k(cls):
-        return int(sqrt(len(cls.link_list)) / 3) + 1
+        return int(sqrt(len(cls.link_list))) + 1
 
     @classmethod
     def cluster(cls, vectors=None, vectorization_mode=TFIDF_MODE):
@@ -123,16 +123,35 @@ class HierarchicalClustering:
             plt.savefig('data/hierarchical_word2vec_plot_1.png')
         plt.close()
 
+    @classmethod
+    def save_graphical_results(cls, vectorization_mode=TFIDF_MODE):
+        cls.start(vectorization_mode)
+        k_list = []
+        purity_list = []
+        ARI_list = []
+        NMI_list = []
+        AMI_list = []
+
+        k = 10
+        while k <= 500:
+            new_vectors = cls.select_k_best_features(k)
+            cls.cluster(vectors=new_vectors, vectorization_mode=vectorization_mode)
+            evaluation = evaluate_clustering(cls.label_list, cls.reference_label_list)
+            k_list.append(k)
+            purity_list.append(evaluation['purity'])
+            ARI_list.append(evaluation['ARI'])
+            NMI_list.append(evaluation['NMI'])
+            AMI_list.append(evaluation['AMI'])
+            print(k, evaluation)
+            k += 8
+
+        with open("data/hierarchical_tfidf_metrics.csv", mode='w') as csv_file:
+            csv_writer = csv.writer(csv_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            csv_writer.writerow(["k", "purity", "ARI", "NMI", "AMI"])
+            for i in range(len(k_list)):
+                csv_writer.writerow([k_list[i], purity_list[i], ARI_list[i], NMI_list[i], AMI_list[i]])
+
+
 
 if __name__ == '__main__':
-    # change this
-    mode = WORD2VEC_MODE
-
-    HierarchicalClustering.start(vectorization_mode=mode)
-    vectors = None
-    if mode == TFIDF_MODE:
-        vectors = HierarchicalClustering.select_k_best_features(200)
-    HierarchicalClustering.cluster(vectors=vectors, vectorization_mode=mode)
-    print(HierarchicalClustering.evaluate())
-
-    # HierarchicalClustering.get_graphical_results(vectorization_mode=mode)
+    HierarchicalClustering.save_graphical_results()

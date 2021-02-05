@@ -25,7 +25,7 @@ class GMMClustering:
             cls.vector_list = TFIDF.document_vector_list
             cls.reference_label_list = TFIDF.reference_label_list
         elif vectorization_mode == WORD2VEC_MODE:
-            w2v = Word2vec(5, 75, 3, 3, 1)
+            w2v = Word2vec(2, 50, 3, 3, 1)
             cls.vector_list, cls.link_list, cls.reference_label_list = w2v.createVectorsOfSentenceByPath(
                 FARSI_DOCUMENTS_PATH)
 
@@ -43,7 +43,7 @@ class GMMClustering:
 
     @classmethod
     def get_n_components(cls):
-        return int(sqrt(len(cls.link_list)) * 0.72) + 1
+        return int(sqrt(len(cls.link_list))) + 1
 
     @classmethod
     def write_results_to_file(cls, mode):
@@ -111,20 +111,32 @@ class GMMClustering:
         plt.title('changes w.r.t. number of features selected')
         if vectorization_mode == TFIDF_MODE:
             plt.savefig('data/gmm_tfidf_plot_4.png')
-        elif vectorization_mode == WORD2VEC_MODE:
-            plt.savefig('data/gmm_word2vec_plot_3.png')
         plt.close()
 
+    @classmethod
+    def save_graphical_results(cls, vectorization_mode=TFIDF_MODE):
+        cls.start(vectorization_mode)
+        k_list = []
+        purity_list = []
+        ARI_list = []
+        NMI_list = []
+        AMI_list = []
 
-if __name__ == '__main__':
-    # change this
-    mode = WORD2VEC_MODE
+        k = cls.get_n_components()
+        while k <= 500:
+            new_vectors = cls.select_k_best_features(k)
+            cls.cluster(vectors=new_vectors, vectorization_mode=vectorization_mode)
+            evaluation = evaluate_clustering(cls.label_list, cls.reference_label_list)
+            k_list.append(k)
+            purity_list.append(evaluation['purity'])
+            ARI_list.append(evaluation['ARI'])
+            NMI_list.append(evaluation['NMI'])
+            AMI_list.append(evaluation['AMI'])
+            print(k, evaluation)
+            k += 8
 
-    GMMClustering.start(mode)
-    vectors = None
-    if mode == TFIDF_MODE:
-        vectors = GMMClustering.select_k_best_features(150)
-    GMMClustering.cluster(vectors=vectors, vectorization_mode=mode)
-    print(GMMClustering.evaluate())
-
-    # GMMClustering.get_graphical_results(TFIDF_MODE)
+        with open("data/gmm_tfidf_metrics.csv", mode='w') as csv_file:
+            csv_writer = csv.writer(csv_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            csv_writer.writerow(["k", "purity", "ARI", "NMI", "AMI"])
+            for i in range(len(k_list)):
+                csv_writer.writerow([k_list[i], purity_list[i], ARI_list[i], NMI_list[i], AMI_list[i]])
