@@ -150,8 +150,3 @@ class HierarchicalClustering:
             csv_writer.writerow(["k", "purity", "ARI", "NMI", "AMI"])
             for i in range(len(k_list)):
                 csv_writer.writerow([k_list[i], purity_list[i], ARI_list[i], NMI_list[i], AMI_list[i]])
-
-
-
-if __name__ == '__main__':
-    HierarchicalClustering.save_graphical_results()
